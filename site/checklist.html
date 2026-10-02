@@ -1,0 +1,1140 @@
+<title>Чек-лист «Меньше, но лучше»</title>
+<meta name="description" content="Проверка продукта по стандарту дизайна на основе десяти принципов Дитера Рамса">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Manrope:wght@600;700;800&display=swap">
+<style>
+/* Раскладка: корпус прибора — тёплый светлый серый, тёмные надписи, шильдики с номерами требований.
+   Цвет появляется только там, где он что-то значит: статус пункта и серьёзность находки. */
+:root {
+  --bg: #ECEAE5;
+  --surface: #F8F7F4;
+  --sunk: #E2DFD8;
+  --ink: #1D1D1B;
+  --muted: #5A5852;
+  --line: #CFCBC2;
+  --signal: #D85A1E;
+  --ok: #2B7348; --ok-bg: #DAEADD;
+  --warn: #8A5A00; --warn-bg: #F2E4C4;
+  --bad: #A93527; --bad-bg: #F3D9D4;
+  --na: #67645D; --na-bg: #E1DED7;
+  --unk: #45567A; --unk-bg: #DCE1EB;
+  --p0: #A93527; --p1: #A84A16; --p2: #8A5A00; --p3: #67645D;
+  --f-display: "Manrope", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "Golos Text", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #191917; --surface: #23231F; --sunk: #2C2B27; --ink: #ECEAE4; --muted: #A9A69D; --line: #3D3C37;
+    --signal: #F07A42;
+    --ok: #74C493; --ok-bg: #1E3225; --warn: #E2B45C; --warn-bg: #3A2F17; --bad: #F2887A; --bad-bg: #3F221E;
+    --na: #A9A69D; --na-bg: #2F2E2A; --unk: #A3B4D8; --unk-bg: #242C3B;
+    --p0: #F2887A; --p1: #EE9E68; --p2: #E2B45C; --p3: #A9A69D;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #191917; --surface: #23231F; --sunk: #2C2B27; --ink: #ECEAE4; --muted: #A9A69D; --line: #3D3C37;
+  --signal: #F07A42;
+  --ok: #74C493; --ok-bg: #1E3225; --warn: #E2B45C; --warn-bg: #3A2F17; --bad: #F2887A; --bad-bg: #3F221E;
+  --na: #A9A69D; --na-bg: #2F2E2A; --unk: #A3B4D8; --unk-bg: #242C3B;
+  --p0: #F2887A; --p1: #EE9E68; --p2: #E2B45C; --p3: #A9A69D;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.55 var(--f-body);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+p { margin: 0; }
+a { color: inherit; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; }
+
+/* ---------- Шапка */
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: saturate(1.2) blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.top .wrap { display: flex; align-items: center; gap: 16px; min-height: 56px; flex-wrap: wrap; padding-block: 8px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 15px/1 var(--f-display); text-decoration: none; background: none; border: 0; padding: 0; cursor: pointer; }
+.brand .lamp { width: 9px; height: 9px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--signal) 22%, transparent); }
+.nav { display: flex; gap: 4px; margin-left: auto; }
+.nav button {
+  border: 0; background: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-weight: 500; color: var(--muted);
+}
+.nav button[aria-current="page"] { color: var(--ink); background: var(--sunk); }
+.nav button:hover { color: var(--ink); }
+
+/* ---------- Общие элементы */
+.eyebrow { font: 500 12px/1.3 var(--f-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.plate {
+  display: inline-flex; align-items: center; font: 500 12px/1 var(--f-mono); letter-spacing: 0.04em;
+  border: 1px solid var(--ink); border-radius: 3px; padding: 4px 6px 3px; white-space: nowrap;
+}
+.tag { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.tag + .tag::before { content: "·"; margin-right: 8px; color: var(--line); }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 42px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); cursor: pointer; font-weight: 600; text-decoration: none; white-space: nowrap;
+}
+.btn:hover { border-color: var(--ink); }
+.btn.primary { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.btn.primary:hover { opacity: 0.88; }
+.btn.danger { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, var(--line)); }
+.btn.small { min-height: 34px; padding: 0 14px; font-size: 14px; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.linkbtn { background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; color: var(--muted); font-size: 14px; }
+.linkbtn:hover { color: var(--ink); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.muted { color: var(--muted); }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.stack { display: grid; gap: 16px; }
+.hidden-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Главная */
+.home { padding-block: 40px 64px; display: grid; gap: 44px; }
+.hero { display: grid; gap: 14px; max-width: 760px; }
+.hero h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.08; font-weight: 800; }
+.hero p { font-size: 18px; color: var(--muted); max-width: 62ch; }
+.motto { font: 600 15px/1.4 var(--f-display); color: var(--ink); }
+.motto span { color: var(--muted); font-weight: 500; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.section-head h2 { font-size: 22px; }
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.mode {
+  text-align: left; padding: 20px; cursor: pointer; display: grid; gap: 10px; align-content: start;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.mode:hover { border-color: var(--ink); }
+.mode h3 { font-size: 19px; }
+.mode .count { font: 500 13px/1 var(--f-mono); color: var(--muted); }
+.mode p { color: var(--muted); font-size: 15px; }
+.mode.main { border-color: var(--ink); }
+.mode .badge-main { justify-self: start; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: var(--ink); color: var(--surface); padding: 3px 8px; border-radius: 4px; }
+.draft { padding: 18px 20px; display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.draft .info { display: grid; gap: 4px; min-width: 0; }
+.draft .info strong { font-size: 17px; overflow-wrap: anywhere; }
+
+.history { display: grid; }
+.history-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center;
+  padding: 14px 4px; border-bottom: 1px solid var(--line); background: none; border-left: 0; border-right: 0; border-top: 0;
+  text-align: left; cursor: pointer; width: 100%;
+}
+.history-row:first-child { border-top: 1px solid var(--line); }
+.history-row:hover .h-title { text-decoration: underline; text-underline-offset: 3px; }
+.h-title { font-weight: 600; overflow-wrap: anywhere; }
+.h-meta { font-size: 14px; color: var(--muted); grid-column: 1; }
+.h-verdict { grid-column: 2; grid-row: 1 / span 2; }
+.empty { padding: 28px 20px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: var(--radius); }
+
+/* ---------- Вердикт-пилюли */
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; border: 1px solid transparent; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.tone-ok { color: var(--ok); background: var(--ok-bg); }
+.tone-warn { color: var(--warn); background: var(--warn-bg); }
+.tone-bad { color: var(--bad); background: var(--bad-bg); }
+.tone-neutral { color: var(--muted); background: var(--sunk); }
+
+/* ---------- Настройка */
+.setup { padding-block: 32px 64px; max-width: 680px; display: grid; gap: 24px; }
+.setup h1 { font-size: 32px; }
+.field { display: grid; gap: 6px; }
+.field label { font-weight: 600; }
+.field .hint { font-size: 14px; color: var(--muted); }
+.field input, .field textarea, .note textarea {
+  width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 10px 12px; min-height: 44px;
+}
+.field input:focus, .field textarea:focus, .note textarea:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 1px var(--ink); }
+.field textarea { min-height: 84px; resize: vertical; }
+.error-text { color: var(--bad); font-size: 14px; }
+
+/* ---------- Проверка */
+.check { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 32px; padding-block: 24px 64px; align-items: start; }
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); display: grid; gap: 18px; }
+.side .review-name { display: grid; gap: 4px; }
+.side .review-name strong { font: 700 17px/1.25 var(--f-display); overflow-wrap: anywhere; }
+.progress { height: 6px; background: var(--sunk); border-radius: 999px; overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--ink); width: 0; transition: width .25s ease; }
+.progress-label { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.groups { display: grid; gap: 2px; list-style: none; padding: 0; margin: 0; }
+.groups button {
+  width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; text-align: left;
+  border: 0; background: none; padding: 9px 10px; border-radius: 8px; cursor: pointer; color: var(--muted);
+}
+.groups button:hover { background: var(--sunk); color: var(--ink); }
+.groups button[aria-current="step"] { background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); font-weight: 600; }
+.groups .g-count { font: 500 12px/1 var(--f-mono); }
+.groups .g-done .g-count { color: var(--ok); }
+.groups .g-flag { color: var(--bad); }
+.toggle { display: flex; gap: 10px; align-items: center; font-size: 14px; color: var(--muted); cursor: pointer; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--ink); }
+
+.group-head { display: grid; gap: 8px; margin-bottom: 20px; }
+.group-head h2 { font-size: clamp(24px, 3.4vw, 32px); }
+.group-head p { color: var(--muted); max-width: 62ch; }
+.items { display: grid; gap: 14px; }
+.item { padding: 20px; display: grid; gap: 14px; scroll-margin-top: 80px; }
+.item.answered { background: color-mix(in srgb, var(--surface) 70%, var(--bg)); }
+.item-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.item-top .quick { font-size: 12px; font-weight: 600; color: var(--muted); }
+.item h3 { font: 600 19px/1.35 var(--f-display); letter-spacing: -0.005em; }
+.design-note { font-size: 13px; color: var(--muted); }
+.hint-box { display: grid; gap: 8px; font-size: 15px; padding: 14px 16px; background: var(--bg); border-radius: 8px; }
+.hint-box .h-label { font-weight: 600; }
+.hint-box .red { color: var(--muted); }
+.hint-box .req-line { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 500; font-size: 15px;
+}
+.choice:hover { border-color: var(--ink); }
+.choice .ic { font-weight: 700; width: 1em; text-align: center; }
+.choice[aria-pressed="true"] { font-weight: 600; }
+.choice.s-yes[aria-pressed="true"] { color: var(--ok); background: var(--ok-bg); border-color: var(--ok); }
+.choice.s-partial[aria-pressed="true"] { color: var(--warn); background: var(--warn-bg); border-color: var(--warn); }
+.choice.s-no[aria-pressed="true"] { color: var(--bad); background: var(--bad-bg); border-color: var(--bad); }
+.choice.s-na[aria-pressed="true"] { color: var(--na); background: var(--na-bg); border-color: var(--na); }
+.choice.s-unknown[aria-pressed="true"] { color: var(--unk); background: var(--unk-bg); border-color: var(--unk); }
+.sev-block { display: grid; gap: 8px; }
+.sev-label { font-size: 14px; font-weight: 600; }
+.sev-label span { font-weight: 400; color: var(--muted); }
+.sev { min-height: 36px; padding: 0 12px; font-size: 14px; }
+.sev .code { font-family: var(--f-mono); font-size: 12px; }
+.sev[aria-pressed="true"] { color: var(--surface); }
+.sev.P0[aria-pressed="true"] { background: var(--p0); border-color: var(--p0); }
+.sev.P1[aria-pressed="true"] { background: var(--p1); border-color: var(--p1); }
+.sev.P2[aria-pressed="true"] { background: var(--p2); border-color: var(--p2); }
+.sev.P3[aria-pressed="true"] { background: var(--p3); border-color: var(--p3); }
+.sev-desc { font-size: 13px; color: var(--muted); }
+.note { display: grid; gap: 6px; }
+.note label { font-size: 14px; font-weight: 600; }
+.note textarea { min-height: 64px; resize: vertical; font-size: 15px; }
+.exc { display: flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
+.exc input { width: 18px; height: 18px; accent-color: var(--ink); }
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
+
+/* ---------- Итог */
+.summary { padding-block: 32px 64px; display: grid; gap: 28px; max-width: 900px; }
+.verdict { padding: 24px; border-radius: var(--radius); display: grid; gap: 10px; border: 1px solid currentColor; }
+.verdict h1 { font-size: clamp(26px, 4vw, 36px); color: inherit; }
+.verdict ul { margin: 0; padding-left: 20px; color: var(--ink); display: grid; gap: 4px; }
+.verdict .v-eyebrow { color: inherit; opacity: 0.85; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.stat { padding: 14px 16px; display: grid; gap: 2px; }
+.stat b { font: 700 26px/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 13px; color: var(--muted); }
+.stat.P0 b { color: var(--p0); } .stat.P1 b { color: var(--p1); } .stat.P2 b { color: var(--p2); } .stat.P3 b { color: var(--p3); }
+.findings { display: grid; gap: 10px; }
+.finding { padding: 16px 18px; display: grid; gap: 8px; border-left: 4px solid var(--line); }
+.finding.P0 { border-left-color: var(--p0); } .finding.P1 { border-left-color: var(--p1); } .finding.P2 { border-left-color: var(--p2); } .finding.P3 { border-left-color: var(--p3); }
+.finding .f-top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.finding .f-sev { font: 500 12px/1 var(--f-mono); font-weight: 700; }
+.finding.P0 .f-sev { color: var(--p0); } .finding.P1 .f-sev { color: var(--p1); } .finding.P2 .f-sev { color: var(--p2); } .finding.P3 .f-sev { color: var(--p3); }
+.finding .f-q { font-weight: 600; }
+.finding .f-note { white-space: pre-wrap; overflow-wrap: anywhere; }
+.finding .f-note.empty-note { color: var(--bad); font-size: 14px; }
+.export { padding: 20px; display: grid; gap: 14px; }
+.export textarea { width: 100%; min-height: 220px; font: 13px/1.5 var(--f-mono); border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: var(--bg); }
+.save-status { font-size: 14px; color: var(--muted); }
+.confirm { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 12px 14px; border-radius: 8px; background: var(--bad-bg); color: var(--bad); }
+.list-plain { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.more { padding: 0; }
+.more summary { display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; cursor: pointer; font: 600 17px/1.3 var(--f-display); list-style: none; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary::after { content: "+"; font-weight: 400; color: var(--muted); }
+.more[open] summary::after { content: "−"; }
+.more .list-plain { padding: 0 18px 16px 38px; font-size: 15px; }
+
+/* ---------- Справочник */
+.guide { padding-block: 32px 64px; display: grid; gap: 32px; }
+.guide-intro { display: grid; gap: 10px; max-width: 760px; }
+.guide-intro h1 { font-size: clamp(28px, 4.4vw, 40px); }
+.guide-intro p { color: var(--muted); font-size: 17px; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.principle { display: grid; gap: 12px; }
+.principle-head { display: flex; gap: 14px; align-items: baseline; border-bottom: 1px solid var(--ink); padding-bottom: 10px; }
+.principle-head .num { font: 800 34px/1 var(--f-display); font-variant-numeric: tabular-nums; min-width: 1.4em; }
+.principle-head h2 { font-size: 22px; }
+.req { padding: 18px 20px; display: grid; gap: 10px; }
+.req .r-text { font-weight: 600; }
+.req .r-q { display: grid; gap: 2px; font-size: 15px; }
+.req .r-q b { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+.req .r-red { font-size: 14px; color: var(--muted); }
+
+/* ---------- Уведомление */
+.toast {
+  position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 20px); transform: translateX(-50%);
+  background: var(--ink); color: var(--surface); padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 500;
+  max-width: calc(100% - 32px); z-index: 20;
+}
+
+@media (max-width: 860px) {
+  .check { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .side { position: static; }
+  .groups { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+  .groups li { flex: none; }
+  .groups button { width: auto; white-space: nowrap; border: 1px solid var(--line); }
+}
+@media (max-width: 520px) {
+  .item { padding: 16px; }
+  .history-row { grid-template-columns: minmax(0, 1fr); }
+  .h-verdict { grid-column: 1; grid-row: auto; justify-self: start; }
+  .nav button { padding: 8px 10px; }
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <button class="brand" type="button" data-go="home"><span class="lamp" aria-hidden="true"></span>Меньше, но лучше</button>
+    <nav class="nav" aria-label="Разделы">
+      <button type="button" data-go="home" id="nav-home">Проверки</button>
+      <button type="button" data-go="guide" id="nav-guide">Справочник</button>
+    </nav>
+  </div>
+</header>
+<main id="app" class="wrap"></main>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script type="application/json" id="checklist-data">{"version":"1.1.0","principles":[{"n":1,"title":"Хороший дизайн инновационен","short":"Инновационность"},{"n":2,"title":"Хороший дизайн делает продукт полезным","short":"Полезность"},{"n":3,"title":"Хороший дизайн эстетичен","short":"Эстетичность"},{"n":4,"title":"Хороший дизайн делает продукт понятным","short":"Понятность"},{"n":5,"title":"Хороший дизайн ненавязчив","short":"Ненавязчивость"},{"n":6,"title":"Хороший дизайн честен","short":"Честность"},{"n":7,"title":"Хороший дизайн долговечен","short":"Долговечность"},{"n":8,"title":"Хороший дизайн тщателен до последней детали","short":"Тщательность"},{"n":9,"title":"Хороший дизайн экологичен","short":"Экологичность"},{"n":10,"title":"Хороший дизайн — это как можно меньше дизайна","short":"Как можно меньше дизайна"}],"groups":[{"key":"task","title":"Задача","intro":"Перед тем как смотреть экраны. Если задача неясна, дальше проверять рано.","order":1},{"key":"glance","title":"Первый взгляд на экран","intro":"Откройте ключевой экран и посмотрите на него как человек, который видит его впервые.","order":2},{"key":"path","title":"Проходим сценарий","intro":"Пройдите сценарий от входа до результата, включая возврат назад.","order":3},{"key":"words","title":"Тексты и обещания","intro":"Прочитайте все тексты сценария подряд: кнопки, подтверждения, подписи.","order":4},{"key":"trouble","title":"Когда что-то идёт не так","intro":"Что видит человек при ожидании, ошибке и прерывании.","order":5},{"key":"data","title":"Реальные данные","intro":"Подставьте настоящее содержимое вместо идеального.","order":6},{"key":"system","title":"Дизайн-система","intro":"Сверка с токенами и библиотекой компонентов.","order":7},{"key":"access","title":"Клавиатура, цвет, движение","intro":"Без мыши, без различения цвета, без анимаций.","order":8},{"key":"result","title":"Результат и данные человека","intro":"Что человек уносит из продукта и что остаётся в нём.","order":9},{"key":"build","title":"Только в сборке","intro":"Эти пункты проверяются в работающем продукте.","order":10}],"items":[{"id":"R2.1","principle":2,"text":"Для каждого ключевого сценария записаны пользователь, ситуация и момент получения ценности","level":"О","stage":"М","check":"Описание решения","group":"task","q":"Понятно, кто пользователь, в какой он ситуации и какой результат должен получить?","qDesign":"Понятно, кто пользователь, в какой он ситуации и какой результат должен получить?","how":"Найдите описание решения. Попробуйте одной фразой назвать момент ценности: «человек … и убедился, что …». Если фраза не складывается, дальше проверять рано.","howDesign":"Найдите описание решения. Попробуйте одной фразой назвать момент ценности: «человек … и убедился, что …». Если фраза не складывается, дальше проверять рано.","red":"Цель сформулирована как функция: «добавить фильтры», «сделать дашборд».","quick":true},{"id":"R1.1","principle":1,"text":"Для новой механики или автоматизации записано, какое затруднение она устраняет, и проведено сравнение с привычным способом на одинаковой задаче","level":"О","stage":"М","check":"Запись решения","group":"task","q":"Если есть новая или нестандартная механика, понятно, какую проблему она решает лучше привычного способа?","qDesign":"Если есть новая или нестандартная механика, понятно, какую проблему она решает лучше привычного способа?","how":"Найдите запись решения: в ней должны быть затруднение и сравнение с привычным способом на одной задаче. Новой механики нет — отметьте «Н/п».","howDesign":"Найдите запись решения: в ней должны быть затруднение и сравнение с привычным способом на одной задаче. Новой механики нет — отметьте «Н/п».","red":"Обоснование звучит как «так современнее» или «у конкурентов так».","quick":false},{"id":"R1.3","principle":1,"text":"Знакомая механика заменяется только при объяснимой выгоде с учётом обучения и ошибок","level":"Р","stage":"М","check":"Запись решения","group":"task","q":"Знакомые механики заменены только там, где выигрыш объясним?","qDesign":"Знакомые механики заменены только там, где выигрыш объясним?","how":"Отметьте места, где интерфейс ведёт себя не так, как в похожих продуктах: поиск, выбор даты, меню, жесты. Для каждого спросите, что человек получает взамен обучения.","howDesign":"Отметьте места, где интерфейс ведёт себя не так, как в похожих продуктах: поиск, выбор даты, меню, жесты. Для каждого спросите, что человек получает взамен обучения.","red":"Своя прокрутка или свой выбор даты без явной выгоды.","quick":false},{"id":"R7.5","principle":7,"text":"Визуальные решения обоснованы задачей, а не модой","level":"Р","stage":"М","check":"Описание решения","group":"task","q":"Визуальные приёмы объяснимы задачей, а не модой?","qDesign":"Визуальные приёмы объяснимы задачей, а не модой?","how":"Для каждого заметного эффекта (стекло, градиенты, крупные скругления, тени) назовите его роль: иерархия, действие, характер продукта. Роль не называется — это мода.","howDesign":"Для каждого заметного эффекта (стекло, градиенты, крупные скругления, тени) назовите его роль: иерархия, действие, характер продукта. Роль не называется — это мода.","red":"Эффект появился, потому что «сейчас так делают».","quick":false},{"id":"R3.1","principle":3,"text":"Визуальный приоритет совпадает с важностью: главное действие и данные выделены, уровни заголовков и текста различимы","level":"О","stage":"М","check":"Ревью макета","group":"glance","q":"С первого взгляда понятно, что на экране главное и что делать дальше?","qDesign":"С первого взгляда понятно, что на экране главное и что делать дальше?","how":"Посмотрите на экран 5 секунд, отвернитесь и назовите главное действие и главные данные. Сравните с тем, что важно для задачи. Помогает уменьшить или размыть макет.","howDesign":"Посмотрите на экран 5 секунд, отвернитесь и назовите главное действие и главные данные. Сравните с тем, что важно для задачи. Помогает уменьшить или размыть макет.","red":"Три одинаково ярких кнопки, или баннер заметнее основного содержимого.","quick":true},{"id":"R2.2","principle":2,"text":"Основное частое действие доступно в контексте сценария, без поиска в глубине меню","level":"О","stage":"М","check":"Прохождение сценария","group":"glance","q":"Основное частое действие под рукой, а не спрятано в меню?","qDesign":"Основное частое действие под рукой, а не спрятано в меню?","how":"Назовите действие, которое человек делает чаще всего в этом сценарии, и посчитайте шаги до него с того экрана, где он находится.","howDesign":"Назовите действие, которое человек делает чаще всего в этом сценарии, и посчитайте шаги до него с того экрана, где он находится.","red":"Ежедневное действие лежит в «⋯» или в настройках.","quick":true},{"id":"R3.5","principle":3,"text":"У каждого акцентного цвета есть назначенная роль: действие, ошибка, предупреждение, успех, выбор","level":"Р","stage":"М","check":"Ревью токенов","group":"glance","q":"Каждый акцентный цвет означает одно и то же во всём продукте?","qDesign":"Каждый акцентный цвет означает одно и то же во всём продукте?","how":"Выпишите акцентные цвета сценария и роль каждого: действие, ошибка, предупреждение, успех, выбор. У одного цвета — одна роль.","howDesign":"Выпишите акцентные цвета сценария и роль каждого: действие, ошибка, предупреждение, успех, выбор. У одного цвета — одна роль.","red":"Синий — это и ссылка, и выбранная строка, и информационный баннер.","quick":false},{"id":"R4.5","principle":4,"text":"Одна иконка означает одно действие во всём продукте; интерактивные элементы отличимы от неинтерактивных","level":"О","stage":"М","check":"Ревью макета","group":"glance","q":"Одна иконка везде означает одно действие, а кликабельное отличается от некликабельного?","qDesign":"Одна иконка везде означает одно действие, а кликабельное отличается от некликабельного?","how":"Сравните одинаковые иконки на разных экранах: делают ли они одно и то же? Попробуйте угадать, что нажимается, не наводя курсор.","howDesign":"Сравните одинаковые иконки на разных экранах: делают ли они одно и то же? Попробуйте угадать, что нажимается, не наводя курсор.","red":"Карандаш где-то редактирует, а где-то открывает подробности; серый текст похож на ссылку.","quick":false},{"id":"R10.1","principle":10,"text":"У каждого элемента и шага есть назначение; дублирующие способы выполнить одну задачу объединены","level":"О","stage":"М","check":"Ревью сценария","group":"glance","q":"У каждого элемента и шага есть работа, и нет двух способов сделать одно и то же без причины?","qDesign":"У каждого элемента и шага есть работа, и нет двух способов сделать одно и то же без причины?","how":"Укажите на каждый элемент и спросите: что сломается, если его убрать? Найдите дубли — одно действие в шапке, в меню и в карточке.","howDesign":"Укажите на каждый элемент и спросите: что сломается, если его убрать? Найдите дубли — одно действие в шапке, в меню и в карточке.","red":"Элемент «для красоты» или «на всякий случай».","quick":false},{"id":"R10.3","principle":10,"text":"Частые действия видимы, редкие настройки раскрываются по необходимости","level":"О","stage":"М","check":"Ревью сценария","group":"glance","q":"Частое — на виду, редкое — раскрывается, когда нужно?","qDesign":"Частое — на виду, редкое — раскрывается, когда нужно?","how":"Разделите действия и настройки экрана на частые и редкие. Частые видны сразу, редкие доступны в одно понятное раскрытие.","howDesign":"Разделите действия и настройки экрана на частые и редкие. Частые видны сразу, редкие доступны в одно понятное раскрытие.","red":"Редкая техническая настройка занимает место на главном экране, а частое действие скрыто.","quick":false},{"id":"R4.1","principle":4,"text":"Видно, где находится человек, что выбрано и как вернуться; в вебе работают адреса страниц, новая вкладка и кнопка «Назад»","level":"О","stage":"М+Р","check":"Прохождение сценария","group":"path","q":"На любом шаге понятно, где я, что выбрано и как вернуться назад?","qDesign":"Показано, где человек находится, что выбрано и как вернуться; для веба — что меняет адрес страницы?","how":"Пройдите сценарий и на каждом шаге ответьте: где я, что выбрано, как вернуться. В вебе нажмите «Назад», откройте страницу в новой вкладке, обновите её.","howDesign":"На каждом фрейме ответьте: где я, что выбрано, как вернуться. Для веба проверьте аннотацию: какие переходы меняют адрес и куда ведёт «Назад».","red":"После перехода пропадает выбранный пункт навигации; «Назад» выбрасывает из сценария.","quick":true},{"id":"R2.3","principle":2,"text":"Обязательными являются только шаги и поля, необходимые сейчас; остальное запрашивается позже","level":"О","stage":"М","check":"Ревью формы","group":"path","q":"Каждое обязательное поле и шаг действительно нужны именно сейчас?","qDesign":"Каждое обязательное поле и шаг действительно нужны именно сейчас?","how":"Для каждого обязательного поля спросите: можно ли закончить задачу без него или запросить его позже? Посчитайте шаги до результата.","howDesign":"Для каждого обязательного поля спросите: можно ли закончить задачу без него или запросить его позже? Посчитайте шаги до результата.","red":"Десять полей регистрации до того, как человек увидел пользу.","quick":false},{"id":"R2.4","principle":2,"text":"Уже введённые данные переиспользуются, контекст сохраняется при переходе между шагами","level":"Р","stage":"М+Р","check":"Прохождение сценария","group":"path","q":"Данные не приходится вводить дважды, и контекст сохраняется между шагами?","qDesign":"Показано, где переиспользуются уже введённые данные и как сохраняется контекст между шагами?","how":"Пройдите сценарий и отметьте каждый повторный ввод и каждое место, где нужно помнить что-то с прошлого шага.","howDesign":"Проследите данные по фреймам: подставлено ли дальше то, что человек ввёл раньше? Остаётся ли ввод на месте при возврате на шаг?","red":"Адрес доставки нужно ввести снова на шаге оплаты.","quick":false},{"id":"R4.3","principle":4,"text":"Область поиска названа; применённые фильтры и ограничения видны и снимаются по отдельности","level":"О","stage":"М","check":"Прохождение сценария поиска","group":"path","q":"Поиск говорит, где он ищет, а применённые фильтры видны и снимаются по одному?","qDesign":"Поиск говорит, где он ищет, а применённые фильтры видны и снимаются по одному?","how":"Примените два фильтра и поищите. Видно ли, что фильтры действуют? Можно ли снять один, не сбрасывая всё? Отличается ли «нет совпадений» от «пока нет данных»? Поиска и фильтров нет — «Н/п».","howDesign":"Примените два фильтра и поищите. Видно ли, что фильтры действуют? Можно ли снять один, не сбрасывая всё? Отличается ли «нет совпадений» от «пока нет данных»? Поиска и фильтров нет — «Н/п».","red":"Пустой список без объяснения, что виноват забытый фильтр.","quick":false},{"id":"R4.4","principle":4,"text":"Подписи полей постоянны и не исчезают при вводе; формат объяснён до ошибки; ошибка связана с конкретным полем","level":"О","stage":"М","check":"Ревью формы","group":"path","q":"Подписи полей не исчезают при вводе, формат объяснён заранее, ошибка стоит у своего поля?","qDesign":"Подписи полей не исчезают при вводе, формат объяснён заранее, ошибка стоит у своего поля?","how":"Посмотрите заполненную форму: понятно ли, что в каком поле? Есть ли подсказка формата до ввода? Где показана ошибка?","howDesign":"Посмотрите заполненную форму: понятно ли, что в каком поле? Есть ли подсказка формата до ввода? Где показана ошибка?","red":"Подпись только в плейсхолдере; ошибки одним списком вверху формы.","quick":false},{"id":"R4.6","principle":4,"text":"Недоступная команда позволяет понять причину недоступности","level":"О","stage":"М","check":"Ревью состояний","group":"path","q":"Если команда недоступна, понятно почему?","qDesign":"Если команда недоступна, понятно почему?","how":"Найдите все неактивные кнопки и пункты меню. Сможет ли человек понять, что сделать, чтобы команда стала доступной?","howDesign":"Найдите все неактивные кнопки и пункты меню. Сможет ли человек понять, что сделать, чтобы команда стала доступной?","red":"Серая кнопка «Отправить» без намёка, какое поле не заполнено.","quick":false},{"id":"R10.2","principle":10,"text":"После удаления или скрытия элемента сценарий пройден заново: упрощение не перенесло сложность в память человека","level":"О","stage":"М","check":"Повторное прохождение сценария","group":"path","q":"После упрощения человеку не нужно помнить, где что спрятано?","qDesign":"После упрощения человеку не нужно помнить, где что спрятано?","how":"Если что-то убрали или спрятали, пройдите сценарий заново как новичок. Находится ли скрытое без подсказки? Не стало ли больше поиска?","howDesign":"Если что-то убрали или спрятали, пройдите сценарий заново как новичок. Находится ли скрытое без подсказки? Не стало ли больше поиска?","red":"Все действия собраны в одно меню: кнопок стало меньше, а поиска — больше.","quick":true},{"id":"R7.2","principle":7,"text":"Изменение привычной навигации, названий и расположения действий сопровождается планом перехода; старые ссылки продолжают работать","level":"О","stage":"М","check":"Запись решения","group":"path","q":"Если меняется привычная навигация или названия, есть план перехода, и старые ссылки работают?","qDesign":"Если меняется привычная навигация или названия, есть план перехода, и старые ссылки работают?","how":"Сравните с текущей версией продукта. Для каждого переезда: как человек найдёт старое действие, откроются ли сохранённые ссылки? Ничего не меняется — «Н/п».","howDesign":"Сравните с текущей версией продукта. Для каждого переезда: как человек найдёт старое действие, откроются ли сохранённые ссылки? Ничего не меняется — «Н/п».","red":"Раздел переименован и перенесён без подсказки, закладки ведут на ошибку.","quick":false},{"id":"R4.2","principle":4,"text":"Одинаковые сущности и действия называются одинаково во всём продукте; кнопки называют результат («Сохранить изменения», а не «ОК»)","level":"О","stage":"М","check":"Сверка со словарём продукта","group":"words","q":"Одна вещь везде называется одинаково, а кнопки говорят, что произойдёт?","qDesign":"Одна вещь везде называется одинаково, а кнопки говорят, что произойдёт?","how":"Выпишите названия сущностей и действий по сценарию и сверьте со словарём продукта. Прочитайте каждую кнопку отдельно: понятен ли результат?","howDesign":"Выпишите названия сущностей и действий по сценарию и сверьте со словарём продукта. Прочитайте каждую кнопку отдельно: понятен ли результат?","red":"«Проект», «пространство» и «доска» про одно и то же; кнопки «ОК» и «Применить».","quick":true},{"id":"R6.2","principle":6,"text":"Стоимость, последствия и необратимость видны до подтверждения; подтверждение необратимого действия называет объект и последствия","level":"О","stage":"М","check":"Ревью сценария","group":"words","q":"До нажатия видно, сколько это стоит, что произойдёт и можно ли отменить?","qDesign":"До нажатия видно, сколько это стоит, что произойдёт и можно ли отменить?","how":"Найдите действия с ценой, последствиями или без отмены. Видно ли это до подтверждения? Называет ли подтверждение удаления конкретный объект?","howDesign":"Найдите действия с ценой, последствиями или без отмены. Видно ли это до подтверждения? Называет ли подтверждение удаления конкретный объект?","red":"«Вы уверены?» без названия того, что удаляется; итоговая цена появляется после оплаты.","quick":true},{"id":"R6.4","principle":6,"text":"Отказ, отмена, отписка и изменение выбора не спрятаны и не сложнее согласия","level":"О","stage":"М","check":"Ревью сценария","group":"words","q":"Отказаться, отменить или отписаться так же легко, как согласиться?","qDesign":"Отказаться, отменить или отписаться так же легко, как согласиться?","how":"Сравните путь согласия и путь отказа: число шагов, заметность кнопок, формулировки.","howDesign":"Сравните путь согласия и путь отказа: число шагов, заметность кнопок, формулировки.","red":"Яркая кнопка «Подключить» и мелкая серая ссылка «Нет, спасибо».","quick":false},{"id":"R6.5","principle":6,"text":"Предварительные, устаревшие, неполные и автоматически созданные данные обозначены как таковые","level":"О","stage":"М","check":"Ревью состояний","group":"words","q":"Предварительные, устаревшие и сгенерированные данные помечены?","qDesign":"Предварительные, устаревшие и сгенерированные данные помечены?","how":"Найдите данные, которые могут быть неточными: черновики, кэш, прогнозы, результат ИИ. Видно ли, что на них нельзя полностью опираться?","howDesign":"Найдите данные, которые могут быть неточными: черновики, кэш, прогнозы, результат ИИ. Видно ли, что на них нельзя полностью опираться?","red":"Сгенерированный текст выглядит как проверенный; у данных нет даты обновления.","quick":false},{"id":"R8.1","principle":8,"text":"Для каждого экрана спроектированы и реализованы состояния: загрузка, нет данных, нет совпадений, ошибка, успех, нет доступа, частичный результат","level":"О","stage":"М+Р","check":"Макет со всеми состояниями, проверка в реализации","group":"trouble","q":"У каждого экрана работают состояния: загрузка, нет данных, нет совпадений, ошибка, успех, нет доступа, частичный результат?","qDesign":"Для каждого экрана нарисованы все состояния: загрузка, нет данных, нет совпадений, ошибка, успех, нет доступа, частичный результат?","how":"Вызовите каждое состояние в продукте: новый аккаунт, поиск без результатов, отключённая сеть, чужая ссылка без прав.","howDesign":"Откройте страницу «Состояния» и пройдите по экранам сценария. Каждое недостающее состояние — отдельная находка.","red":"Нарисован только «счастливый путь», ошибка — на усмотрение разработчика.","quick":true},{"id":"R8.2","principle":8,"text":"При исправимой ошибке введённые данные сохраняются; повторить можно только неудавшуюся часть","level":"О","stage":"М+Р","check":"Сценарий с ошибкой","group":"trouble","q":"После исправимой ошибки введённое сохраняется, а повторить можно только неудачное?","qDesign":"Описано, что сохраняется при ошибке и что можно повторить?","how":"Заполните форму, отключите сеть и отправьте. Сохранился ли ввод? Для пакетных операций: можно ли повторить только неудачные элементы?","howDesign":"Найдите фрейм ошибки: виден ли на нём ввод человека? Есть ли действие «Повторить», и что именно оно повторяет?","red":"После ошибки сервера форма очищается.","quick":true},{"id":"R6.1","principle":6,"text":"Успех сообщается только после подтверждения результата системой; различаются локальное сохранение, отправка, обработка и синхронизация, когда это влияет на действия человека","level":"О","stage":"М+Р","check":"Проверка с медленной и отключённой сетью","group":"trouble","q":"«Готово» и «Сохранено» появляются, только когда это правда?","qDesign":"Описано, какие стадии результата различает система и что человек видит на каждой?","how":"Сохраните что-нибудь на медленной сети и без сети. Совпадает ли сообщение с тем, что произошло на самом деле? Видно ли, что сохранено локально, а что синхронизировано?","howDesign":"Найдите аннотацию стадий: локально, отправлено, обработано, синхронизировано — и что видит человек на каждой. Сверьте с разработчиком, какие стадии система действительно различает.","red":"Галочка «Отправлено» появляется сразу, хотя запрос мог не дойти.","quick":true},{"id":"R6.3","principle":6,"text":"Индикатор прогресса точен: определённый, когда объём известен, неопределённый — когда нет","level":"О","stage":"М+Р","check":"Проверка в реализации","group":"trouble","q":"Индикатор прогресса не притворяется точным?","qDesign":"Указано, какой индикатор прогресса используется и почему?","how":"Запустите долгую операцию. Если показаны проценты, соответствуют ли они реальному ходу? Если объём неизвестен, используется ли неопределённый индикатор?","howDesign":"Для каждой долгой операции проверьте: известен ли объём, и подобран ли под это определённый или неопределённый индикатор.","red":"Полоса быстро доходит до 90% и висит минуту.","quick":false},{"id":"R5.1","principle":5,"text":"Модальное окно и предупреждение используются только когда нужно решение человека сейчас; обычные обратимые действия не подтверждаются, а отменяются","level":"О","stage":"М","check":"Ревью сценария","group":"trouble","q":"Каждое модальное окно и подтверждение требует реального решения?","qDesign":"Каждое модальное окно и подтверждение требует реального решения?","how":"Перечислите модальные окна и подтверждения сценария. Нужно ли в каждом решить что-то прямо сейчас? Обратимые действия лучше отменять, чем подтверждать.","howDesign":"Перечислите модальные окна и подтверждения сценария. Нужно ли в каждом решить что-то прямо сейчас? Обратимые действия лучше отменять, чем подтверждать.","red":"Модальное окно «Изменения сохранены» с кнопкой «ОК».","quick":true},{"id":"R5.2","principle":5,"text":"Фоновые обновления не перехватывают фокус и не сбивают позицию чтения или ввода","level":"О","stage":"М+Р","check":"Проверка в реализации","group":"trouble","q":"Фоновые обновления не сбивают фокус, позицию чтения и ввод?","qDesign":"Описано, что меняется на экране при фоновом обновлении и что остаётся на месте?","how":"Пока читаете или вводите текст, вызовите обновление данных. Прыгает ли список? Теряется ли курсор?","howDesign":"Найдите экраны с живыми данными. Есть ли аннотация: новое появляется с плашкой «Показать новые» или вставляется молча?","red":"Новый комментарий сдвигает текст, который человек читает.","quick":false},{"id":"R5.4","principle":5,"text":"Уведомления разделены на срочные и несрочные, повторяющиеся объединяются, частота и каналы настраиваются","level":"Р","stage":"М","check":"Ревью системы уведомлений","group":"trouble","q":"Уведомления разделены по срочности, не дублируются и настраиваются?","qDesign":"Уведомления разделены по срочности, не дублируются и настраиваются?","how":"Перечислите уведомления сценария. Какие требуют действия сейчас, а какие подождут? Объединяются ли повторяющиеся? Уведомлений нет — «Н/п».","howDesign":"Перечислите уведомления сценария. Какие требуют действия сейчас, а какие подождут? Объединяются ли повторяющиеся? Уведомлений нет — «Н/п».","red":"Десять одинаковых уведомлений подряд; один тип нельзя отключить.","quick":false},{"id":"R3.3","principle":3,"text":"Композиция выдерживает реальные данные: длинные названия, 0, 1 и много элементов, пользовательские изображения, выбранные состояния","level":"О","stage":"М+Р","check":"Проверка на реальном содержимом","group":"data","q":"Длинные названия, пустые и переполненные списки, чужие картинки не ломают экран?","qDesign":"В макете есть фреймы с крайними данными: длинные названия, 0, 1 и много элементов, чужие изображения?","how":"Создайте объект с очень длинным названием, пустой список и список на сотни строк, загрузите вертикальную и тёмную картинку.","howDesign":"Откройте страницу «Крайние данные». Если её нет, подставьте в ключевые экраны длинный текст и пустые списки сами.","red":"Название обрезано так, что два объекта не различить; в макете только «Проект 1».","quick":true},{"id":"R7.4","principle":7,"text":"Компоненты проверены на рост числа элементов, длинные переводы и дополнительные состояния","level":"Р","stage":"М","check":"Проверка на крайних данных","group":"data","q":"Компоненты выдерживают рост данных и длинный перевод?","qDesign":"Компоненты выдерживают рост данных и длинный перевод?","how":"Представьте, что элементов стало в десять раз больше, а текст при переводе стал длиннее на треть. Что сломается первым: навигация, таблица, кнопки?","howDesign":"Представьте, что элементов стало в десять раз больше, а текст при переводе стал длиннее на треть. Что сломается первым: навигация, таблица, кнопки?","red":"Вкладки рассчитаны ровно на четыре раздела.","quick":false},{"id":"R8.6","principle":8,"text":"Проверены длинные строки, переносы, форматы дат и чисел, поддерживаемые языки","level":"О","stage":"М+Р","check":"Проверка на крайних данных","group":"data","q":"Даты, числа, переносы и длинные строки выглядят правильно?","qDesign":"Показаны длинные строки, переносы, форматы дат и чисел?","how":"Проверьте большие суммы, отрицательные числа, даты прошлых лет, длинные слова без пробелов, имена на разных языках.","howDesign":"Найдите в макете примеры вроде «1 234 567,89 ₽», даты прошлого года, длинного адреса почты. Их нет — это находка.","red":"Сумма вылезает из ячейки; дата в непривычном для аудитории формате.","quick":false},{"id":"R3.4","principle":3,"text":"Текст читаем: контраст соответствует WCAG 2.2 AA на фактическом фоне, вспомогательный текст не осветлён до нечитаемости, интерфейс работает при увеличении до 200%","level":"О","stage":"М+Р","check":"Автопроверка контраста, ручная проверка масштаба","group":"data","q":"Текст легко читается: контраст не ниже AA, а при увеличении до 200% ничего не обрезано?","qDesign":"Контраст текста проверен в макете, и описано, как раскладка ведёт себя при увеличении?","how":"Прогоните автопроверку контраста. Увеличьте страницу до 200% и пройдите сценарий.","howDesign":"Проверьте контраст всех цветов текста, особенно вспомогательного. Есть ли фрейм или правило для увеличенного текста?","red":"Светло-серый мелкий текст на белом фоне.","quick":false},{"id":"R3.2","principle":3,"text":"Интервалы отражают группы, выравнивание устойчиво; отступы, типографика и цвета берутся из токенов дизайн-системы","level":"О","stage":"М+Р","check":"Ревью макета и кода","group":"system","q":"Цвета, шрифты и отступы взяты из токенов, а группы читаются по интервалам?","qDesign":"Используются переменные и стили библиотеки, без «ручных» цветов и отступов?","how":"Сравните с дизайн-системой: нет ли значений, которых в ней нет? Видно ли по отступам, что к чему относится?","howDesign":"Выделите слои и проверьте привязку цветов и типографики к переменным и стилям. Поищите отступы вне шкалы.","red":"Пятнадцать оттенков серого; между группами столько же места, сколько внутри группы.","quick":false},{"id":"R7.1","principle":7,"text":"Экраны собираются из компонентов дизайн-системы; новый вариант компонента создаётся только с записью решения","level":"О","stage":"М+Р","check":"Ревью макета и кода","group":"system","q":"Экраны собраны из компонентов дизайн-системы, без одноразовых вариантов?","qDesign":"Экраны собраны из компонентов библиотеки, а новые варианты оформлены записью решения?","how":"Найдите элементы, похожие на компоненты системы, но отличающиеся от них. Есть ли на каждый запись решения?","howDesign":"Поищите отсоединённые копии компонентов и «почти такие же» кнопки и карточки.","red":"Третья версия кнопки, нарисованная прямо на экране.","quick":false},{"id":"R8.3","principle":8,"text":"Все основные действия доступны с клавиатуры, фокус видим, порядок логичен; модальный диалог переносит фокус внутрь, закрывается по Esc и возвращает фокус (W3C APG)","level":"О","stage":"М+Р","check":"Ручная проверка, автотест","group":"access","q":"Весь сценарий проходится с клавиатуры, фокус виден, диалоги ловят и возвращают фокус?","qDesign":"Аннотирован порядок фокуса для нестандартных элементов и диалогов, описаны Esc и возврат фокуса?","how":"Уберите мышь. Пройдите сценарий клавишами Tab, Shift+Tab, Enter, Esc и стрелками. Всегда ли видно, где фокус? Куда он возвращается после закрытия диалога?","howDesign":"Найдите аннотации фокуса у диалогов, меню и нестандартных элементов. Есть ли состояние фокуса в компонентах библиотеки?","red":"Фокус пропадает после закрытия окна; свой выпадающий список не открывается с клавиатуры.","quick":false},{"id":"R8.4","principle":8,"text":"У элементов управления есть доступные имена; состояние не передаётся только цветом","level":"О","stage":"М+Р","check":"Автопроверка (axe), экранный диктор","group":"access","q":"Элементы понятно озвучиваются, и смысл не передаётся только цветом?","qDesign":"У иконок без подписи указаны доступные имена, а состояния различимы без цвета?","how":"Прогоните axe или Lighthouse. Включите экранный диктор на ключевых элементах. Посмотрите экран в оттенках серого.","howDesign":"Переведите макет в оттенки серого: различимы ли ошибка, успех и выбор? Проверьте аннотации имён у кнопок-иконок.","red":"Ошибка обозначена только красной рамкой; кнопка-иконка озвучивается просто как «кнопка».","quick":false},{"id":"R8.5","principle":8,"text":"У перетаскивания есть альтернативный способ выполнить ту же операцию","level":"О","stage":"М+Р","check":"Проверка в реализации","group":"access","q":"Всё, что перетаскивается, можно сделать и без перетаскивания?","qDesign":"У перетаскивания описана альтернатива?","how":"Для каждой операции перетаскивания найдите другой способ: команда в меню, кнопки «выше» и «ниже», клавиатура. Перетаскивания нет — «Н/п».","howDesign":"Найдите в макете альтернативный способ для каждого перетаскивания.","red":"Порядок задач меняется только мышью.","quick":false},{"id":"R5.3","principle":5,"text":"Анимация помогает проследить изменение и не задерживает частые действия; учитывается настройка уменьшения движения; смысл не передаётся только движением","level":"О","stage":"М+Р","check":"Проверка с prefers-reduced-motion","group":"access","q":"Анимации помогают понять изменение и не мешают при уменьшении движения?","qDesign":"Для каждой анимации указаны назначение и поведение при уменьшении движения?","how":"Пройдите сценарий с включённой системной настройкой «Уменьшить движение». Ничего важного не потерялось? Не тормозят ли анимации частые действия?","howDesign":"Найдите аннотации анимаций: зачем нужна каждая и что происходит при уменьшении движения.","red":"Каждый переход длится секунду; смысл передан только движением.","quick":false},{"id":"R1.2","principle":1,"text":"Результат автоматизации виден до применения или легко исправляется; при отказе технологии человек может закончить задачу другим путём","level":"О","stage":"М+Р","check":"Сценарий с ошибкой автоматизации","group":"result","q":"Результат автоматизации можно увидеть до применения или исправить, а при сбое задача всё равно решается?","qDesign":"Для автоматизации показаны предпросмотр или исправление результата и путь при отказе?","how":"Запустите автоматическое действие. Видно ли, что изменится? Можно ли поправить результат? Что будет, если автоматизация ошиблась или недоступна? Автоматизации нет — «Н/п».","howDesign":"Найдите фреймы предпросмотра, правки и отказа автоматизации.","red":"ИИ переписал весь документ без предпросмотра и отмены.","quick":false},{"id":"R2.5","principle":2,"text":"Результат применим за пределами экрана: экспорт открывается в следующем инструменте, ссылка работает, подтверждение содержит нужные сведения","level":"О","stage":"М+Р","check":"Проверка результата вне продукта","group":"result","q":"Результат работает за пределами продукта?","qDesign":"Показано, как выглядит результат вне продукта: письмо, файл, ссылка, подтверждение?","how":"Используйте результат там, куда он нужен: откройте файл в следующем инструменте, перейдите по ссылке с другого устройства, прочитайте письмо.","howDesign":"Найдите фреймы письма, файла, уведомления или страницы по ссылке. Есть ли в них всё, что нужно человеку дальше?","red":"Выгрузка в CSV ломает кириллицу; в письме-подтверждении нет времени встречи.","quick":false},{"id":"R7.3","principle":7,"text":"Человек может получить доступ к своему накопленному результату и выгрузить его","level":"О","stage":"М+Р","check":"Проверка выгрузки","group":"result","q":"Человек может получить и выгрузить свои данные?","qDesign":"Спроектированы доступ к своим данным и выгрузка?","how":"Найдите путь к выгрузке своих данных. Проверьте, что файл полный и читается. Сценарий не касается данных человека — «Н/п».","howDesign":"Найдите фреймы выгрузки или пометку, что сценарий не создаёт данных человека.","red":"Данные можно загрузить, но нельзя забрать.","quick":false},{"id":"R9.4","principle":9,"text":"Для хранимых данных определены срок хранения и удаление; утверждения об экологичности делаются только на основе измерений","level":"Р","stage":"М+Р","check":"Ревью политики данных","group":"result","q":"Понятно, сколько хранятся данные и как они удаляются?","qDesign":"Указаны срок хранения и удаление для данных, которые создаёт сценарий?","how":"Найдите, где человек узнаёт срок хранения и как удалить свои данные. Проверьте, что удаление действительно работает.","howDesign":"Проверьте аннотацию: какие данные создаются, сколько хранятся, как удаляются.","red":"Удалённый аккаунт продолжает получать письма.","quick":false},{"id":"R10.4","principle":10,"text":"Налог на ценность ключевых сценариев измерен до и после изменения: успешность, время до результата, ошибки, возвраты, обращения за помощью","level":"Р","stage":"М+Р","check":"Протокол аудита или исследования","group":"result","q":"Налог на ценность записан, и есть с чем сравнить после изменений?","qDesign":"Определено, как измерить налог на ценность: на прототипе с людьми и после выпуска?","how":"Для ключевого сценария запишите успешность, время до результата, ошибки, возвраты и обращения за помощью. Сравните с прошлым замером.","howDesign":"Проверьте, что в описании решения названы показатели и способ их получить: тест прототипа или данные после выпуска.","red":"Успех измеряют числом нажатий на новую кнопку.","quick":false},{"id":"R8.7","principle":8,"text":"Реализация сверена с замыслом в работающем продукте; расхождения записаны с причинами","level":"О","stage":"Р","check":"Дизайн-приёмка сборки","group":"build","q":"Сборка совпадает с макетом по всем состояниям и аннотациям?","qDesign":"Сборка совпадает с макетом по всем состояниям и аннотациям?","how":"Откройте макет и сборку рядом. Пройдите все состояния и аннотации. Каждое расхождение исправьте или запишите с причиной и отразите в макете.","howDesign":"Откройте макет и сборку рядом. Пройдите все состояния и аннотации. Каждое расхождение исправьте или запишите с причиной и отразите в макете.","red":"Экран ошибки «немного упростили» при разработке.","quick":false},{"id":"R9.1","principle":9,"text":"Медиа загружается в размере фактического отображения; тяжёлые материалы — при необходимости","level":"О","stage":"Р","check":"Инструменты разработчика браузера","group":"build","q":"Картинки и видео не тяжелее, чем нужно для показа?","qDesign":"Картинки и видео не тяжелее, чем нужно для показа?","how":"Откройте инструменты разработчика, вкладку сети. Сравните размер изображений с размером, в котором они показаны.","howDesign":"Откройте инструменты разработчика, вкладку сети. Сравните размер изображений с размером, в котором они показаны.","red":"Превью 100×100 загружается из оригинала на 5 МБ.","quick":false},{"id":"R9.2","principle":9,"text":"Нет постоянных фоновых опросов, одновременного автопроигрывания и повторной обработки без пользы","level":"Р","stage":"Р","check":"Ревью сетевой активности","group":"build","q":"Нет лишних фоновых запросов и автопроигрывания?","qDesign":"Нет лишних фоновых запросов и автопроигрывания?","how":"Оставьте страницу открытой на пару минут и посмотрите вкладку сети. Есть ли постоянные запросы без видимой пользы? Играют ли видео сами?","howDesign":"Оставьте страницу открытой на пару минут и посмотрите вкладку сети. Есть ли постоянные запросы без видимой пользы? Играют ли видео сами?","red":"Опрос сервера каждую секунду на неактивной вкладке.","quick":false},{"id":"R9.3","principle":9,"text":"Ключевые сценарии проверены на обычном устройстве и медленном соединении","level":"О","stage":"Р","check":"Проверка с ограничением сети и процессора","group":"build","q":"Сценарий нормально работает на обычном устройстве и медленной сети?","qDesign":"Сценарий нормально работает на обычном устройстве и медленной сети?","how":"Включите в инструментах разработчика замедление сети и процессора или возьмите недорогой телефон. Пройдите сценарий.","howDesign":"Включите в инструментах разработчика замедление сети и процессора или возьмите недорогой телефон. Пройдите сценарий.","red":"На медленной сети белый экран 10 секунд без признаков загрузки.","quick":false}]}</script>
+<script>
+(function () {
+  "use strict";
+
+  // ------------------------------------------------------------------ Данные
+  const DATA = JSON.parse(document.getElementById("checklist-data").textContent);
+  const ITEMS = DATA.items;
+  const BY_ID = Object.fromEntries(ITEMS.map((i) => [i.id, i]));
+  const GROUPS = DATA.groups;
+  const PRINCIPLES = Object.fromEntries(DATA.principles.map((p) => [p.n, p]));
+
+  const MODES = {
+    design: {
+      title: "Дизайн-ревью", ctx: "design", main: true,
+      desc: "Макет или прототип перед передачей в разработку. Главная проверка.",
+      filter: (i) => i.stage !== "Р",
+    },
+    quick: {
+      title: "Быстрая проверка", ctx: "design",
+      desc: "Самые важные пункты, чтобы прогнать макет на ходу. Не заменяет дизайн-ревью.",
+      filter: (i) => i.quick,
+    },
+    release: {
+      title: "Приёмка сборки", ctx: "build",
+      desc: "Работающая сборка против макета перед выпуском.",
+      filter: (i) => i.stage !== "М",
+    },
+    audit: {
+      title: "Аудит продукта", ctx: "build",
+      desc: "Существующий продукт: найти всё, что не дотягивает до стандарта, и составить план.",
+      filter: () => true,
+    },
+  };
+  const MODE_ORDER = ["design", "quick", "release", "audit"];
+  const STATUS = [
+    { k: "yes", label: "Да", ic: "✓" },
+    { k: "partial", label: "Частично", ic: "~" },
+    { k: "no", label: "Нет", ic: "✕" },
+    { k: "na", label: "Н/п", ic: "—" },
+    { k: "unknown", label: "Не проверить", ic: "?" },
+  ];
+  const STATUS_MD = { yes: "✅", partial: "⚠️", no: "❌", na: "н/п", unknown: "не проверено" };
+  const SEV = [
+    { k: "P0", label: "Блокер", desc: "не закончит задачу, потеряет данные или будет введён в заблуждение" },
+    { k: "P1", label: "Серьёзно", desc: "трудно восстановиться после ошибки, непонятно, что происходит" },
+    { k: "P2", label: "Нагрузка", desc: "лишние действия, поиск, запоминание" },
+    { k: "P3", label: "Полировка", desc: "мелкие визуальные неточности" },
+  ];
+  const LEVEL = { "О": "Обязательно", "Р": "Рекомендуется" };
+  const STAGE = { "М": "Макет", "М+Р": "Макет и сборка", "Р": "Сборка" };
+  const FINDING = (s) => s === "partial" || s === "no";
+
+  // ------------------------------------------------------------------ Утилиты
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const plural = (n, a, b, c) => {
+    const m10 = n % 10, m100 = n % 100;
+    return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c;
+  };
+  const fmtDate = (ts) => {
+    try { return new Date(ts).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { return ""; }
+  };
+  const fmtTime = (ts) => {
+    try { return new Date(ts).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; }
+  };
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* хранилище недоступно */ } },
+    del(k) { try { localStorage.removeItem(k); } catch (e) { /* хранилище недоступно */ } },
+  };
+  const DRAFT_KEY = "mnl-checklist-draft-v1";
+  const PREF_KEY = "mnl-checklist-prefs-v1";
+
+  let toastTimer = null;
+  function toast(msg) {
+    const t = $("#toast");
+    t.textContent = msg;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
+  }
+
+  // ------------------------------------------------------------------ Состояние
+  const prefs = Object.assign({ hints: true }, store.get(PREF_KEY) || {});
+  const state = { view: "home", review: null, groupIdx: 0, setupMode: null, guideStage: "all", confirmDelete: false, exportOpen: false };
+
+  const draft = store.get(DRAFT_KEY);
+  if (draft && draft.review && MODES[draft.review.mode]) {
+    state.review = draft.review;
+    state.groupIdx = draft.groupIdx || 0;
+    if (draft.view === "check" || draft.view === "summary") state.view = draft.view;
+  }
+  if (location.hash === "#guide") state.view = "guide";
+
+  let draftTimer = null;
+  function flushDraft() {
+    clearTimeout(draftTimer);
+    draftTimer = null;
+    if (state.review) store.set(DRAFT_KEY, { review: state.review, view: state.view, groupIdx: state.groupIdx });
+  }
+  function persistDraft() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(flushDraft, 250);
+  }
+  window.addEventListener("pagehide", flushDraft);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushDraft(); });
+
+  function modeItems(mode) { return ITEMS.filter(MODES[mode].filter); }
+  function modeGroups(mode) {
+    const items = modeItems(mode);
+    return GROUPS.map((g) => ({ ...g, items: items.filter((i) => i.group === g.key) })).filter((g) => g.items.length);
+  }
+  function ans(id) { return (state.review && state.review.answers[id]) || {}; }
+  function q(item, mode) { return MODES[mode].ctx === "design" ? item.qDesign : item.q; }
+  function how(item, mode) { return MODES[mode].ctx === "design" ? item.howDesign : item.how; }
+
+  // ------------------------------------------------------------------ Вердикт
+  function analyze(review) {
+    const items = modeItems(review.mode);
+    const a = (id) => review.answers[id] || {};
+    const unanswered = items.filter((i) => !a(i.id).s);
+    const findings = items.filter((i) => FINDING(a(i.id).s));
+    const noSev = findings.filter((i) => !a(i.id).sev);
+    const sevCount = { P0: 0, P1: 0, P2: 0, P3: 0 };
+    findings.forEach((i) => { if (a(i.id).sev) sevCount[a(i.id).sev]++; });
+    const mandatoryOpen = findings.filter((i) => i.level === "О" && !a(i.id).exc);
+    const unknown = items.filter((i) => a(i.id).s === "unknown");
+    const unknownMandatory = unknown.filter((i) => i.level === "О");
+    const recommendedOpen = items.filter((i) => i.level === "Р" && !["yes", "na"].includes(a(i.id).s));
+    const exceptions = findings.filter((i) => a(i.id).exc);
+    return { items, unanswered, findings, noSev, sevCount, mandatoryOpen, unknown, unknownMandatory, recommendedOpen, exceptions, answered: items.length - unanswered.length };
+  }
+
+  function verdict(review) {
+    const x = analyze(review);
+    const blockers = x.sevCount.P0 + x.sevCount.P1;
+    const incomplete = [];
+    if (x.unanswered.length) incomplete.push(`Без ответа: ${x.unanswered.length} ${plural(x.unanswered.length, "пункт", "пункта", "пунктов")}.`);
+    if (x.noSev.length) incomplete.push(`У ${x.noSev.length} ${plural(x.noSev.length, "находки", "находок", "находок")} не указана серьёзность.`);
+    const mand = x.mandatoryOpen.length ? `Обязательные пункты без исправления или исключения: ${x.mandatoryOpen.map((i) => i.id).join(", ")}.` : null;
+    const unk = x.unknownMandatory.length ? `Не проверены обязательные пункты: ${x.unknownMandatory.map((i) => i.id).join(", ")}. Найдите способ проверить их.` : null;
+
+    if (review.mode === "design" || review.mode === "quick") {
+      const quick = review.mode === "quick";
+      if (review.answers["R2.1"] && review.answers["R2.1"].s === "no") {
+        return { tone: "bad", title: "Вернуться к задаче", detail: ["Непонятны пользователь или момент ценности (R2.1). Сначала заполните описание решения, потом возвращайтесь к экранам."] };
+      }
+      if (blockers) {
+        return {
+          tone: "bad", title: quick ? "Есть блокеры" : "Доработать",
+          detail: [`Блокеров: ${x.sevCount.P0}, серьёзных: ${x.sevCount.P1}. Исправьте их в макете и повторите ${quick ? "проверку" : "ревью"}.`, mand].filter(Boolean),
+        };
+      }
+      if (incomplete.length) return { tone: "neutral", title: quick ? "Проверка не завершена" : "Ревью не завершено", detail: incomplete };
+      if (x.mandatoryOpen.length) return { tone: "warn", title: "Доработать", detail: [mand, "Исправьте в макете или оформите исключение с датой пересмотра."] };
+      if (unk) return { tone: "neutral", title: "Не хватает проверок", detail: [unk] };
+      if (quick) return { tone: "ok", title: "Явных блокеров нет", detail: ["Можно идти на полное дизайн-ревью."] };
+      const d = ["Нет открытых P0 и P1, обязательные пункты выполнены или оформлены исключением."];
+      if (x.sevCount.P2 + x.sevCount.P3) d.push(`Находки P2 и P3 (${x.sevCount.P2 + x.sevCount.P3}) заведите задачами с номерами требований.`);
+      return { tone: "ok", title: "Готово к передаче", detail: d };
+    }
+
+    if (review.mode === "release") {
+      if (x.sevCount.P0) return { tone: "bad", title: "Нельзя выпускать", detail: [`Блокеров: ${x.sevCount.P0}. P0 исправляется до выпуска.`] };
+      if (incomplete.length) return { tone: "neutral", title: "Приёмка не завершена", detail: incomplete };
+      if (unk) return { tone: "neutral", title: "Не хватает проверок", detail: [unk] };
+      if (x.mandatoryOpen.length) return { tone: "warn", title: "Решить до выпуска", detail: [mand, "Исправьте или оформите исключение с датой пересмотра."] };
+      const d = ["Блокеров нет, обязательные пункты выполнены или оформлены исключением."];
+      if (x.sevCount.P1) d.push(`Серьёзные находки (${x.sevCount.P1}) исправить в ближайшем цикле.`);
+      return { tone: "ok", title: "Можно выпускать", detail: d };
+    }
+
+    // Аудит
+    const pre = incomplete.length ? "Предварительно · " : "";
+    const tail = incomplete.length ? incomplete : [];
+    if (x.sevCount.P0) return { tone: "bad", title: pre + "Ниже уровня 1", detail: [`Блокеров: ${x.sevCount.P0}. Сначала исправьте их.`, ...tail] };
+    if (x.sevCount.P1 || x.mandatoryOpen.length) {
+      return { tone: "warn", title: pre + "Уровень 1 · Работает", detail: [`Для уровня 2 закройте серьёзные находки (${x.sevCount.P1}) и обязательные пункты.`, mand, ...tail].filter(Boolean) };
+    }
+    if (x.recommendedOpen.length || !review.peopleChecked) {
+      const need = [];
+      if (x.recommendedOpen.length) need.push(`рекомендованные пункты: ${x.recommendedOpen.map((i) => i.id).join(", ")}`);
+      if (!review.peopleChecked) need.push("подтверждение наблюдением за людьми");
+      return { tone: "ok", title: pre + "Уровень 2 · Понятно и честно", detail: [`Для уровня 3 не хватает: ${need.join("; ")}.`, unk, ...tail].filter(Boolean) };
+    }
+    return { tone: "ok", title: pre + "Уровень 3 · Меньше, но лучше", detail: ["Все требования выполнены, результат подтверждён наблюдением за людьми.", unk, ...tail].filter(Boolean) };
+  }
+
+  // ------------------------------------------------------------------ Возможности платформы
+  const cap = { db: null, user: null, downloads: null, myId: null, history: [], historyState: "loading", names: {} };
+  let saveChain = Promise.resolve();
+  let teamTimer = null;
+  let saveStatus = "";
+
+  async function initCapabilities() {
+    if (!window.claude || typeof window.claude.use !== "function") {
+      cap.historyState = "off";
+      refreshHistory();
+      return;
+    }
+    const [db, user, downloads] = await Promise.all([
+      window.claude.use("db").catch(() => null),
+      window.claude.use("user").catch(() => null),
+      window.claude.use("downloads").catch(() => null),
+    ]);
+    cap.db = db; cap.user = user; cap.downloads = downloads;
+    if (user) { try { cap.myId = await user.id(); } catch (e) { cap.myId = null; } }
+    if (db) {
+      db.collection("reviews").orderBy("updatedAt", "desc").limit(100).onSnapshot(
+        (snap) => {
+          cap.history = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          cap.historyState = "ready";
+          refreshHistory();
+        },
+        () => { cap.historyState = "error"; refreshHistory(); }
+      );
+    } else {
+      cap.historyState = "off";
+    }
+    refreshHistory();
+    if (state.view === "summary") render();
+  }
+
+  function serialize(r) {
+    const x = analyze(r);
+    const v = verdict(r);
+    return {
+      mode: r.mode, product: r.product, scenario: r.scenario || "", link: r.link || "", people: r.people || "",
+      answers: Object.entries(r.answers).map(([id, a]) => ({ id, s: a.s || "", sev: a.sev || "", note: a.note || "", exc: !!a.exc })),
+      peopleChecked: !!r.peopleChecked,
+      createdAt: r.createdAt, updatedAt: Date.now(), authorId: r.authorId || cap.myId || "",
+      std: DATA.version, verdict: v.title, tone: v.tone, counts: x.sevCount, answered: x.answered, total: x.items.length,
+    };
+  }
+  function deserialize(id, d) {
+    const answers = {};
+    (d.answers || []).forEach((a) => { if (BY_ID[a.id]) answers[a.id] = { s: a.s || undefined, sev: a.sev || undefined, note: a.note || "", exc: !!a.exc }; });
+    return {
+      id, mode: MODES[d.mode] ? d.mode : "design", product: d.product || "Без названия", scenario: d.scenario || "", link: d.link || "",
+      people: d.people || "", answers, peopleChecked: !!d.peopleChecked, createdAt: d.createdAt || Date.now(), authorId: d.authorId || "", savedToTeam: true,
+    };
+  }
+
+  function teamSaveNow() {
+    const r = state.review;
+    if (!cap.db || !r) return;
+    const col = cap.db.collection("reviews");
+    const ref = r.id ? col.doc(r.id) : col.doc();
+    if (!r.id) { r.id = ref.id; r.authorId = r.authorId || cap.myId || ""; }
+    const body = serialize(r);
+    saveStatus = "saving"; updateSaveUi();
+    saveChain = saveChain.then(() => ref.set(body)).then(
+      () => { r.savedToTeam = true; saveStatus = "saved:" + Date.now(); updateSaveUi(); persistDraft(); },
+      (e) => {
+        const code = e && e.code;
+        saveStatus = code === "invalid_argument" ? "denied" : code === "quota_exceeded" ? "quota" : "error";
+        updateSaveUi();
+      }
+    );
+  }
+  function scheduleTeamSave() {
+    if (!cap.db || !state.review || !state.review.savedToTeam) return;
+    clearTimeout(teamTimer);
+    teamTimer = setTimeout(teamSaveNow, 1500);
+  }
+  function changed() { persistDraft(); scheduleTeamSave(); }
+
+  function saveText() {
+    if (!saveStatus) return state.review && state.review.savedToTeam ? "Сохранено в истории команды." : "";
+    if (saveStatus === "saving") return "Сохраняется…";
+    if (saveStatus.startsWith("saved:")) return `Сохранено в истории команды в ${fmtTime(Number(saveStatus.slice(6)))}. Дальнейшие изменения сохраняются сами.`;
+    if (saveStatus === "denied") return "Нет прав на запись в историю. Попросите владельца дать доступ «Участник» или выше.";
+    if (saveStatus === "quota") return "История команды заполнена. Удалите старые проверки и попробуйте снова.";
+    return "Не удалось сохранить. Проверьте соединение и нажмите «Сохранить» ещё раз.";
+  }
+  function updateSaveUi() {
+    const el = $("#save-status");
+    if (el) el.textContent = saveText();
+    const side = $("#side-save");
+    if (side) side.textContent = state.review && state.review.savedToTeam ? (saveStatus === "saving" ? "Сохраняется…" : "В истории команды") : "Черновик на этом устройстве";
+  }
+
+  // ------------------------------------------------------------------ Отрисовка
+  const app = $("#app");
+
+  function setNav() {
+    $("#nav-home").setAttribute("aria-current", state.view === "guide" ? "false" : "page");
+    $("#nav-guide").setAttribute("aria-current", state.view === "guide" ? "page" : "false");
+  }
+
+  function render(focusSel) {
+    setNav();
+    if (state.view === "home") app.innerHTML = renderHome();
+    else if (state.view === "setup") app.innerHTML = renderSetup();
+    else if (state.view === "check") app.innerHTML = renderCheck();
+    else if (state.view === "summary") app.innerHTML = renderSummary();
+    else if (state.view === "guide") app.innerHTML = renderGuide();
+    if (state.view === "home") refreshHistory();
+    updateSaveUi();
+    if (focusSel) { const el = $(focusSel); if (el) el.focus({ preventScroll: true }); }
+  }
+
+  function renderHome() {
+    const r = state.review;
+    let draftHtml = "";
+    if (r) {
+      const x = analyze(r);
+      draftHtml = `
+      <section aria-labelledby="draft-h">
+        <div class="section-head"><h2 id="draft-h">Продолжить</h2></div>
+        <div class="card draft">
+          <div class="info">
+            <span class="eyebrow">${esc(MODES[r.mode].title)}</span>
+            <strong>${esc(r.product)}${r.scenario ? " · " + esc(r.scenario) : ""}</strong>
+            <span class="muted">Отвечено ${x.answered} из ${x.items.length} · находок ${x.findings.length}${r.savedToTeam ? " · в истории команды" : " · черновик на этом устройстве"}</span>
+          </div>
+          <div class="row">
+            <button class="btn" type="button" data-act="open-summary">Итог</button>
+            <button class="btn primary" type="button" data-act="resume">Продолжить</button>
+          </div>
+        </div>
+      </section>`;
+    }
+    const modes = MODE_ORDER.map((k) => {
+      const m = MODES[k], n = modeItems(k).length;
+      return `<button class="mode${m.main ? " main" : ""}" type="button" data-act="new" data-mode="${k}">
+        ${m.main ? '<span class="badge-main">Главная проверка</span>' : ""}
+        <h3>${esc(m.title)}</h3>
+        <span class="count">${n} ${plural(n, "пункт", "пункта", "пунктов")}</span>
+        <p>${esc(m.desc)}</p>
+      </button>`;
+    }).join("");
+    return `
+    <div class="home">
+      <section class="hero">
+        <span class="eyebrow">Стандарт дизайна · версия ${esc(DATA.version)}</span>
+        <h1>Пройдите продукт по стандарту</h1>
+        <p>Десять принципов Дитера Рамса, разложенные на ${ITEMS.length} ${plural(ITEMS.length, "проверку", "проверки", "проверок")}. Отмечайте пункт за пунктом — в конце будет вердикт, список находок и отчёт, который можно отдать команде.</p>
+        <p class="motto">«Меньше, но лучше» <span>— Дитер Рамс</span></p>
+      </section>
+      ${draftHtml}
+      <section aria-labelledby="new-h">
+        <div class="section-head"><h2 id="new-h">Новая проверка</h2>${r ? '<span class="muted">Текущий черновик будет заменён</span>' : ""}</div>
+        <div class="modes">${modes}</div>
+      </section>
+      <section aria-labelledby="hist-h">
+        <div class="section-head"><h2 id="hist-h">История команды</h2></div>
+        <div id="history"></div>
+      </section>
+    </div>`;
+  }
+
+  function refreshHistory() {
+    const el = $("#history");
+    if (!el) return;
+    if (cap.historyState === "loading") { el.innerHTML = '<p class="empty">Загружаем историю проверок…</p>'; return; }
+    if (cap.historyState === "off") { el.innerHTML = '<p class="empty">История команды доступна в опубликованной версии чек-листа на claude.ai. Здесь проверка сохраняется только на этом устройстве.</p>'; return; }
+    if (cap.historyState === "error") { el.innerHTML = '<p class="empty">Не удалось загрузить историю. Обновите страницу.</p>'; return; }
+    if (!cap.history.length) { el.innerHTML = '<p class="empty">Пока ни одной сохранённой проверки. Пройдите проверку и нажмите «Сохранить в историю команды» на экране итога.</p>'; return; }
+    el.innerHTML = '<div class="history">' + cap.history.map((h) => {
+      const mode = MODES[h.mode] ? MODES[h.mode].title : "Проверка";
+      const c = h.counts || {};
+      const finds = ["P0", "P1", "P2", "P3"].map((k) => (c[k] ? `${k}: ${c[k]}` : "")).filter(Boolean).join(", ");
+      return `<button type="button" class="history-row" data-act="open-history" data-id="${esc(h.id)}">
+        <span class="h-title">${esc(h.product || "Без названия")}${h.scenario ? " · " + esc(h.scenario) : ""}</span>
+        <span class="h-meta">${esc(mode)} · ${esc(fmtDate(h.updatedAt))}${h.authorId ? ` · <span data-author="${esc(h.authorId)}"></span>` : ""}${finds ? " · " + esc(finds) : ""}</span>
+        <span class="h-verdict"><span class="pill tone-${esc(h.tone || "neutral")}">${esc(h.verdict || "")}</span></span>
+      </button>`;
+    }).join("") + "</div>";
+    resolveAuthors();
+  }
+  async function resolveAuthors() {
+    if (!cap.user) return;
+    const spans = Array.from(document.querySelectorAll("[data-author]"));
+    if (!spans.length) return;
+    const ids = Array.from(new Set(spans.map((s) => s.dataset.author)));
+    let ps = {};
+    try { ps = await cap.user.profiles(ids); } catch (e) { return; }
+    spans.forEach((s) => { const p = ps[s.dataset.author]; s.textContent = (p && p.name) || "участник команды"; });
+  }
+
+  function renderSetup() {
+    const m = MODES[state.setupMode];
+    const n = modeItems(state.setupMode).length;
+    const scenarioHint = state.setupMode === "audit"
+      ? "Аудит идёт по сценариям, а не по экранам. Перечислите 3–5 ключевых: самые частые и самые дорогие при ошибке."
+      : "Например: «Запись на встречу с телефона».";
+    const linkLabel = m.ctx === "design" ? "Ссылка на макет или прототип" : "Ссылка на сборку или продукт";
+    return `
+    <form class="setup" id="setup-form" novalidate>
+      <button type="button" class="linkbtn" data-go="home">← Все проверки</button>
+      <div class="stack" style="gap:8px">
+        <span class="eyebrow">${n} ${plural(n, "пункт", "пункта", "пунктов")}</span>
+        <h1>${esc(m.title)}</h1>
+        <p class="muted">${esc(m.desc)}</p>
+      </div>
+      <div class="field">
+        <label for="f-product">Продукт</label>
+        <input id="f-product" name="product" autocomplete="off" required>
+        <span class="error-text" id="f-product-err" hidden>Назовите продукт — по названию проверку найдут в истории.</span>
+      </div>
+      <div class="field">
+        <label for="f-scenario">Что проверяем</label>
+        <textarea id="f-scenario" name="scenario" aria-describedby="f-scenario-hint"></textarea>
+        <span class="hint" id="f-scenario-hint">${esc(scenarioHint)}</span>
+      </div>
+      <div class="field">
+        <label for="f-link">${linkLabel}</label>
+        <input id="f-link" name="link" inputmode="url" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="f-people">Участники</label>
+        <input id="f-people" name="people" autocomplete="off" aria-describedby="f-people-hint">
+        <span class="hint" id="f-people-hint">${m.ctx === "design" ? "Автор макета, ревьюер, разработчик, владелец продукта." : "Кто проводит проверку."}</span>
+      </div>
+      <div class="row"><button class="btn primary" type="submit">Начать проверку</button></div>
+    </form>`;
+  }
+
+  function sideHtml() {
+    const r = state.review, groups = modeGroups(r.mode), x = analyze(r);
+    const pct = x.items.length ? Math.round((x.answered / x.items.length) * 100) : 0;
+    const list = groups.map((g, idx) => {
+      const done = g.items.filter((i) => ans(i.id).s).length;
+      const flags = g.items.filter((i) => FINDING(ans(i.id).s)).length;
+      const full = done === g.items.length;
+      return `<li><button type="button" data-act="group" data-idx="${idx}" ${idx === state.groupIdx && state.view === "check" ? 'aria-current="step"' : ""} class="${full ? "g-done" : ""}">
+        <span>${esc(g.title)}${flags ? ` <span class="g-flag" aria-label="находок: ${flags}">●</span>` : ""}</span>
+        <span class="g-count">${done}/${g.items.length}</span>
+      </button></li>`;
+    }).join("");
+    return `
+    <aside class="side" aria-label="Ход проверки">
+      <div class="review-name">
+        <span class="eyebrow">${esc(MODES[r.mode].title)}</span>
+        <strong>${esc(r.product)}</strong>
+        <span class="tag" id="side-save"></span>
+      </div>
+      <div class="stack" style="gap:6px">
+        <div class="progress" role="progressbar" aria-label="Отвечено" aria-valuemin="0" aria-valuemax="${x.items.length}" aria-valuenow="${x.answered}"><span style="width:${pct}%"></span></div>
+        <div class="progress-label"><span>Отвечено ${x.answered} из ${x.items.length}</span><span>Находок ${x.findings.length}</span></div>
+      </div>
+      <ul class="groups">${list}
+        <li><button type="button" data-act="open-summary" ${state.view === "summary" ? 'aria-current="step"' : ""}><span>Итог и отчёт</span><span class="g-count">→</span></button></li>
+      </ul>
+      <label class="toggle"><input type="checkbox" id="hints-toggle" ${prefs.hints ? "checked" : ""}> Показывать подсказки</label>
+    </aside>`;
+  }
+
+  function itemHtml(i) {
+    const r = state.review, a = ans(i.id), m = MODES[r.mode];
+    const design = m.ctx === "design";
+    const st = STATUS.map((s) => `<button type="button" class="choice s-${s.k}" data-act="status" data-id="${i.id}" data-v="${s.k}" aria-pressed="${a.s === s.k}"><span class="ic" aria-hidden="true">${s.ic}</span>${s.label}</button>`).join("");
+    const sevSel = SEV.find((s) => s.k === a.sev);
+    const sev = FINDING(a.s) ? `
+      <div class="sev-block">
+        <span class="sev-label" id="sev-${i.id}">Серьёзность <span>— что случится с человеком${design ? ", если реализовать как есть" : ""}</span></span>
+        <div class="choices" role="group" aria-labelledby="sev-${i.id}">
+          ${SEV.map((s) => `<button type="button" class="choice sev ${s.k}" data-act="sev" data-id="${i.id}" data-v="${s.k}" aria-pressed="${a.sev === s.k}"><span class="code">${s.k}</span>${s.label}</button>`).join("")}
+        </div>
+        <span class="sev-desc">${sevSel ? esc(sevSel.label + ": " + sevSel.desc + ".") : "Выберите серьёзность — от неё зависит вердикт."}</span>
+      </div>` : "";
+    const exc = FINDING(a.s) && i.level === "О"
+      ? `<label class="exc"><input type="checkbox" data-act="exc" data-id="${i.id}" ${a.exc ? "checked" : ""}> Оформлено исключение из стандарта</label>` : "";
+    const hint = prefs.hints ? `
+      <div class="hint-box">
+        <p><span class="h-label">Как проверить. </span>${esc(how(i, r.mode))}</p>
+        <p class="red"><span class="h-label">Тревожный признак. </span>${esc(i.red)}</p>
+        <p class="req-line">Требование ${esc(i.id)}: ${esc(i.text)}</p>
+      </div>` : "";
+    return `
+    <article class="card item${a.s ? " answered" : ""}" id="item-${i.id}" aria-labelledby="q-${i.id}">
+      <div class="item-top">
+        <span class="plate">${i.id}</span>
+        <span class="tag">${esc(PRINCIPLES[i.principle].short)}</span>
+        <span class="tag">${LEVEL[i.level]}</span>
+        <span class="tag">${STAGE[i.stage]}</span>
+      </div>
+      <h3 id="q-${i.id}">${esc(q(i, r.mode))}</h3>
+      ${design && i.stage === "М+Р" ? '<p class="design-note">Поведение видно только в сборке. Здесь проверяем, что оно спроектировано и описано в макете.</p>' : ""}
+      ${hint}
+      <div class="choices" role="group" aria-label="Результат проверки ${i.id}">${st}</div>
+      ${sev}
+      ${exc}
+      <div class="note">
+        <label for="note-${i.id}">${FINDING(a.s) ? "Что не так — где и как воспроизвести" : "Заметка"}</label>
+        <textarea id="note-${i.id}" data-act="note" data-id="${i.id}" rows="2">${esc(a.note || "")}</textarea>
+      </div>
+    </article>`;
+  }
+
+  function renderCheck() {
+    const r = state.review, groups = modeGroups(r.mode);
+    if (state.groupIdx >= groups.length) state.groupIdx = groups.length - 1;
+    if (state.groupIdx < 0) state.groupIdx = 0;
+    const g = groups[state.groupIdx];
+    const last = state.groupIdx === groups.length - 1;
+    return `
+    <div class="check">
+      ${sideHtml()}
+      <section aria-labelledby="group-h">
+        <div class="group-head">
+          <span class="eyebrow">Блок ${state.groupIdx + 1} из ${groups.length}</span>
+          <h2 id="group-h" tabindex="-1">${esc(g.title)}</h2>
+          <p>${esc(g.intro)}</p>
+        </div>
+        <div class="items">${g.items.map(itemHtml).join("")}</div>
+        <div class="pager">
+          ${state.groupIdx > 0 ? `<button class="btn" type="button" data-act="group" data-idx="${state.groupIdx - 1}">← ${esc(groups[state.groupIdx - 1].title)}</button>` : "<span></span>"}
+          ${last ? '<button class="btn primary" type="button" data-act="open-summary">К итогу</button>'
+                 : `<button class="btn primary" type="button" data-act="group" data-idx="${state.groupIdx + 1}">${esc(groups[state.groupIdx + 1].title)} →</button>`}
+        </div>
+      </section>
+    </div>`;
+  }
+
+  function renderSummary() {
+    const r = state.review, x = analyze(r), v = verdict(r), m = MODES[r.mode];
+    const sevOrder = { P0: 0, P1: 1, P2: 2, P3: 3 };
+    const finds = x.findings.slice().sort((a, b) => (sevOrder[ans(a.id).sev] ?? 4) - (sevOrder[ans(b.id).sev] ?? 4));
+    const findHtml = finds.length ? finds.map((i) => {
+      const a = ans(i.id);
+      return `<div class="card finding ${a.sev || ""}">
+        <div class="f-top">
+          <span class="f-sev">${a.sev ? a.sev + " · " + SEV.find((s) => s.k === a.sev).label : "Серьёзность не указана"}</span>
+          <span class="plate">${i.id}</span>
+          <span class="tag">${a.s === "partial" ? "Частично" : "Нет"}</span>
+          ${a.exc ? '<span class="tag">Оформлено исключение</span>' : ""}
+        </div>
+        <p class="f-q">${esc(q(i, r.mode))}</p>
+        ${a.note ? `<p class="f-note">${esc(a.note)}</p>` : '<p class="f-note empty-note">Нет описания. Добавьте, что именно не так, — иначе задачу не воспроизвести.</p>'}
+        <div class="row">
+          <button class="btn small" type="button" data-act="goto" data-id="${i.id}">Открыть пункт</button>
+          <button class="btn small" type="button" data-act="copy-issue" data-id="${i.id}">Скопировать как задачу</button>
+        </div>
+      </div>`;
+    }).join("") : '<p class="empty">Находок нет.</p>';
+    const listBlock = (title, list) => list.length ? `
+      <details class="card more" ${list.length <= 5 ? "open" : ""}>
+        <summary><span>${title}</span><span class="g-count">${list.length}</span></summary>
+        <ul class="list-plain">${list.map((i) => `<li><button class="linkbtn" type="button" data-act="goto" data-id="${i.id}">${i.id}</button> — ${esc(q(i, r.mode))}</li>`).join("")}</ul>
+      </details>` : "";
+    const pendingList = listBlock("Без ответа", x.unanswered);
+    const unknownList = listBlock("Не удалось проверить", x.unknown);
+    const people = r.mode === "audit" ? `
+      <label class="toggle" style="color:var(--ink)"><input type="checkbox" id="people-checked" ${r.peopleChecked ? "checked" : ""}> Результат подтверждён наблюдением за 3–5 людьми, выполнявшими задачи без подсказок</label>` : "";
+    const teamBtn = cap.db
+      ? `<button class="btn primary" type="button" data-act="team-save">${r.savedToTeam ? "Сохранить сейчас" : "Сохранить в историю команды"}</button>` : "";
+    const dlBtn = cap.downloads ? '<button class="btn" type="button" data-act="download">Скачать .md</button>' : "";
+    const del = r.savedToTeam && cap.db ? (state.confirmDelete
+      ? `<div class="confirm" role="alert"><span>Удалить проверку из истории команды без возможности восстановить?</span><button class="btn small danger" type="button" data-act="delete-yes">Удалить</button><button class="btn small" type="button" data-act="delete-no">Отмена</button></div>`
+      : '<div><button class="btn small danger" type="button" data-act="delete-ask">Удалить из истории</button></div>') : "";
+    return `
+    <div class="check">
+      ${sideHtml()}
+      <div class="summary" style="padding-block:0">
+        <section class="verdict tone-${v.tone}" aria-labelledby="verdict-h">
+          <span class="eyebrow v-eyebrow">${esc(m.title)} · ${esc(r.product)}</span>
+          <h1 id="verdict-h" tabindex="-1">${esc(v.title)}</h1>
+          <ul>${v.detail.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>
+        </section>
+        ${people}
+        <div class="stats">
+          <div class="card stat"><b>${x.answered}/${x.items.length}</b><span>отвечено</span></div>
+          ${SEV.map((s) => `<div class="card stat ${s.k}"><b>${x.sevCount[s.k]}</b><span>${s.k} · ${s.label.toLowerCase()}</span></div>`).join("")}
+        </div>
+        <section class="stack" style="gap:12px" aria-labelledby="finds-h">
+          <h2 id="finds-h" style="font-size:22px">Находки</h2>
+          <div class="findings">${findHtml}</div>
+        </section>
+        ${pendingList}
+        ${unknownList}
+        <section class="card export" aria-labelledby="export-h">
+          <h2 id="export-h" style="font-size:20px">Отчёт</h2>
+          <p class="muted">Отчёт в Markdown по шаблону отчёта аудита: вставьте в задачу, в документ или отдайте Claude, чтобы он завёл задачи по находкам.</p>
+          <div class="row">
+            ${teamBtn}
+            <button class="btn" type="button" data-act="copy-report">Скопировать отчёт</button>
+            ${dlBtn}
+            <button class="btn" type="button" data-act="toggle-export">${state.exportOpen ? "Скрыть текст" : "Показать текст"}</button>
+          </div>
+          <p class="save-status" id="save-status" aria-live="polite"></p>
+          <label class="hidden-text" for="export-text">Текст отчёта</label>
+          <textarea id="export-text" readonly ${state.exportOpen ? "" : "hidden"}>${esc(reportMd())}</textarea>
+          ${del}
+        </section>
+        <div class="row">
+          <button class="btn" type="button" data-act="group" data-idx="0">← К пунктам</button>
+          <button class="btn" type="button" data-go="home">Новая проверка</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderGuide() {
+    const f = state.guideStage;
+    const chips = [["all", "Все"], ["М", "Макет"], ["М+Р", "Макет и сборка"], ["Р", "Сборка"]]
+      .map(([k, l]) => `<button type="button" class="choice" data-act="guide-filter" data-v="${k}" aria-pressed="${f === k}">${l}</button>`).join("");
+    const body = DATA.principles.map((p) => {
+      const reqs = ITEMS.filter((i) => i.principle === p.n && (f === "all" || i.stage === f))
+        .sort((a, b) => Number(a.id.split(".")[1]) - Number(b.id.split(".")[1]));
+      if (!reqs.length) return "";
+      return `<section class="principle" aria-labelledby="p-${p.n}">
+        <div class="principle-head"><span class="num" aria-hidden="true">${p.n}</span><h2 id="p-${p.n}">${esc(p.title)}</h2></div>
+        ${reqs.map((i) => `<article class="card req">
+          <div class="item-top"><span class="plate">${i.id}</span><span class="tag">${LEVEL[i.level]}</span><span class="tag">${STAGE[i.stage]}</span>${i.quick ? '<span class="tag">В быстрой проверке</span>' : ""}</div>
+          <p class="r-text">${esc(i.text)}</p>
+          ${i.stage === "Р" ? `<div class="r-q"><b>Вопрос</b>${esc(i.q)}</div>`
+            : i.stage === "М" ? `<div class="r-q"><b>Вопрос</b>${esc(i.q)}</div><div class="r-q"><b>Как проверить</b>${esc(i.how)}</div>`
+            : `<div class="r-q"><b>В макете</b>${esc(i.qDesign)}</div><div class="r-q"><b>В продукте</b>${esc(i.q)}</div>`}
+          <p class="r-red">Тревожный признак: ${esc(i.red)}</p>
+        </article>`).join("")}
+      </section>`;
+    }).join("");
+    return `
+    <div class="guide">
+      <div class="guide-intro">
+        <span class="eyebrow">Стандарт · версия ${esc(DATA.version)}</span>
+        <h1>Справочник требований</h1>
+        <p>Все ${ITEMS.length} ${plural(ITEMS.length, "требование", "требования", "требований")} по десяти принципам Дитера Рамса — с вопросом, по которому их проверяют, и признаком нарушения. Принципы принадлежат Рамсу, требования и вопросы — наша интерпретация для цифровых продуктов.</p>
+      </div>
+      <div class="filters" role="group" aria-label="Этап проверки">${chips}</div>
+      ${body}
+    </div>`;
+  }
+
+  // ------------------------------------------------------------------ Отчёты
+  const cell = (s) => String(s || "").replace(/\|/g, "\\|").replace(/\s*\n\s*/g, " ");
+  function reportMd() {
+    const r = state.review; if (!r) return "";
+    const x = analyze(r), v = verdict(r), m = MODES[r.mode];
+    const L = [`# ${m.title}: ${r.product}`, ""];
+    L.push(`Стандарт дизайна ${DATA.version} · ${fmtDate(Date.now())}${r.people ? " · Участники: " + r.people : ""}`);
+    if (r.scenario) L.push("", `**Что проверяли:** ${r.scenario}`);
+    if (r.link) L.push("", `**Ссылка:** ${r.link}`);
+    L.push("", "## Итог", "", `**${v.title}**`, "", ...v.detail.map((d) => "- " + d), "");
+    L.push("| Серьёзность | Количество |", "| --- | --- |", ...SEV.map((s) => `| ${s.k} — ${s.label.toLowerCase()} | ${x.sevCount[s.k]} |`));
+    L.push("", `Отвечено ${x.answered} из ${x.items.length}.`, "", "## Находки", "");
+    const order = { P0: 0, P1: 1, P2: 2, P3: 3 };
+    const finds = x.findings.slice().sort((a, b) => (order[ans(a.id).sev] ?? 4) - (order[ans(b.id).sev] ?? 4));
+    if (finds.length) {
+      L.push("| # | Требование | Серьёзность | Статус | Что проверяли | Что не так |", "| --- | --- | --- | --- | --- | --- |");
+      finds.forEach((i, n) => {
+        const a = ans(i.id);
+        L.push(`| ${n + 1} | ${i.id} | ${a.sev || "не указана"} | ${STATUS_MD[a.s]}${a.exc ? ", исключение" : ""} | ${cell(q(i, r.mode))} | ${cell(a.note) || "—"} |`);
+      });
+    } else L.push("Находок нет.");
+    L.push("", "## Все пункты", "");
+    modeGroups(r.mode).forEach((g) => {
+      L.push(`### ${g.title}`, "");
+      g.items.forEach((i) => {
+        const a = ans(i.id);
+        L.push(`- ${a.s ? STATUS_MD[a.s] : "без ответа"}${a.sev ? " " + a.sev : ""} **${i.id}** — ${q(i, r.mode)}${a.note ? `\n  ${a.note.replace(/\n/g, "\n  ")}` : ""}`);
+      });
+      L.push("");
+    });
+    return L.join("\n").trim() + "\n";
+  }
+  function issueMd(id) {
+    const r = state.review, i = BY_ID[id], a = ans(id), sev = SEV.find((s) => s.k === a.sev);
+    const title = `[${id}] ${q(i, r.mode)}`;
+    return [
+      `**${title}**`, "",
+      `**Требование:** ${id} — ${i.text}`, "",
+      `**Серьёзность:** ${sev ? sev.k + " " + sev.label.toLowerCase() : "не указана"}`, "",
+      `**Сценарий:** ${r.scenario || r.product}`, "",
+      "## Что происходит", "", a.note || "<опишите шаги и наблюдаемое поведение>", "",
+      "## Что ожидается по стандарту", "", q(i, r.mode), "",
+      "## Доказательство", "", r.link ? r.link : "<скриншот, запись экрана, вывод автопроверки>", "",
+    ].join("\n");
+  }
+  async function copyText(text, okMsg) {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast(okMsg);
+    } catch (e) {
+      state.exportOpen = true;
+      render();
+      const ta = $("#export-text");
+      if (ta) { ta.value = text; ta.focus(); ta.select(); }
+      toast("Не получилось скопировать автоматически — текст выделен, скопируйте его вручную.");
+    }
+  }
+
+  // ------------------------------------------------------------------ Действия
+  function startReview(form) {
+    const product = form.product.value.trim();
+    if (!product) { $("#f-product-err").hidden = false; form.product.focus(); return; }
+    state.review = {
+      id: null, mode: state.setupMode, product, scenario: form.scenario.value.trim(), link: form.link.value.trim(), people: form.people.value.trim(),
+      answers: {}, peopleChecked: false, createdAt: Date.now(), authorId: cap.myId || "", savedToTeam: false,
+    };
+    saveStatus = "";
+    state.view = "check"; state.groupIdx = 0; state.confirmDelete = false; state.exportOpen = false;
+    persistDraft();
+    render("#group-h");
+    window.scrollTo(0, 0);
+  }
+
+  function setAnswer(id, patch) {
+    const r = state.review;
+    const a = Object.assign({}, r.answers[id] || {}, patch);
+    if (!FINDING(a.s)) { delete a.sev; delete a.exc; }
+    r.answers[id] = a;
+    changed();
+  }
+
+  function rerenderItem(id, focusSel) {
+    const el = $("#item-" + CSS.escape(id));
+    if (el) el.outerHTML = itemHtml(BY_ID[id]);
+    const side = $(".side");
+    if (side) side.outerHTML = sideHtml();
+    updateSaveUi();
+    if (focusSel) { const f = $(focusSel); if (f) f.focus({ preventScroll: true }); }
+  }
+
+  function gotoItem(id) {
+    const groups = modeGroups(state.review.mode);
+    const idx = groups.findIndex((g) => g.items.some((i) => i.id === id));
+    if (idx < 0) return;
+    state.view = "check"; state.groupIdx = idx; persistDraft();
+    render();
+    const el = $("#item-" + CSS.escape(id));
+    if (el) { el.scrollIntoView({ block: "start" }); const b = el.querySelector(".choice"); if (b) b.focus({ preventScroll: true }); }
+  }
+
+  async function openHistory(id) {
+    const h = cap.history.find((x) => x.id === id);
+    if (!h) return;
+    let data = h;
+    try { const snap = await cap.db.collection("reviews").doc(id).get(); if (snap.exists) data = snap.data(); } catch (e) { /* берём то, что уже пришло в подписке */ }
+    state.review = deserialize(id, data);
+    saveStatus = ""; state.view = "summary"; state.groupIdx = 0; state.confirmDelete = false; state.exportOpen = false;
+    persistDraft();
+    render("#verdict-h");
+    window.scrollTo(0, 0);
+  }
+
+  async function deleteReview() {
+    const r = state.review;
+    if (!cap.db || !r || !r.id) return;
+    try {
+      await saveChain;
+      await cap.db.collection("reviews").doc(r.id).delete();
+      r.id = null; r.savedToTeam = false; saveStatus = ""; state.confirmDelete = false;
+      persistDraft(); render(); toast("Проверка удалена из истории.");
+    } catch (e) {
+      state.confirmDelete = false; render();
+      toast(e && e.code === "invalid_argument" ? "Нет прав удалить эту проверку." : "Не удалось удалить. Попробуйте ещё раз.");
+    }
+  }
+
+  async function download() {
+    const r = state.review;
+    const name = `${MODES[r.mode].title} — ${r.product}`.replace(/[\\/:*?"<>|]+/g, " ").slice(0, 120) + ".md";
+    try {
+      await cap.downloads.save({ filename: name, data: reportMd() });
+    } catch (e) {
+      if (e && e.code === "declined") return;
+      toast(e && e.code === "rate_limited" ? "Окно сохранения уже открыто." : "Скачать не получилось. Скопируйте отчёт.");
+    }
+  }
+
+  document.addEventListener("click", (e) => {
+    const go = e.target.closest("[data-go]");
+    if (go) {
+      state.view = go.dataset.go; state.confirmDelete = false;
+      if (state.view === "guide") { try { history.replaceState(null, "", "#guide"); } catch (err) { /* без истории */ } }
+      else { try { history.replaceState(null, "", location.pathname + location.search); } catch (err) { /* без истории */ } }
+      persistDraft(); render(); window.scrollTo(0, 0);
+      return;
+    }
+    const t = e.target.closest("[data-act]");
+    if (!t || t.tagName === "TEXTAREA") return;
+    const act = t.dataset.act, id = t.dataset.id;
+    switch (act) {
+      case "new": state.setupMode = t.dataset.mode; state.view = "setup"; render("#f-product"); window.scrollTo(0, 0); break;
+      case "resume": state.view = "check"; persistDraft(); render("#group-h"); window.scrollTo(0, 0); break;
+      case "open-summary": state.view = "summary"; state.confirmDelete = false; persistDraft(); render("#verdict-h"); window.scrollTo(0, 0); break;
+      case "group": state.view = "check"; state.groupIdx = Number(t.dataset.idx); persistDraft(); render("#group-h"); window.scrollTo(0, 0); break;
+      case "status": {
+        const cur = ans(id).s;
+        setAnswer(id, { s: cur === t.dataset.v ? undefined : t.dataset.v });
+        rerenderItem(id, `#item-${CSS.escape(id)} .choice[data-act="status"][data-v="${t.dataset.v}"]`);
+        break;
+      }
+      case "sev": setAnswer(id, { sev: t.dataset.v }); rerenderItem(id, `#item-${CSS.escape(id)} .sev[data-v="${t.dataset.v}"]`); break;
+      case "goto": gotoItem(id); break;
+      case "copy-issue": copyText(issueMd(id), "Задача скопирована."); break;
+      case "copy-report": copyText(reportMd(), "Отчёт скопирован."); break;
+      case "toggle-export": state.exportOpen = !state.exportOpen; render(); break;
+      case "download": download(); break;
+      case "team-save": teamSaveNow(); break;
+      case "delete-ask": state.confirmDelete = true; render(); break;
+      case "delete-no": state.confirmDelete = false; render(); break;
+      case "delete-yes": deleteReview(); break;
+      case "open-history": openHistory(id); break;
+      case "guide-filter": state.guideStage = t.dataset.v; render(); break;
+    }
+  });
+
+  document.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.id === "hints-toggle") { prefs.hints = t.checked; store.set(PREF_KEY, prefs); render("#hints-toggle"); return; }
+    if (t.id === "people-checked") { state.review.peopleChecked = t.checked; changed(); render("#people-checked"); return; }
+    if (t.dataset && t.dataset.act === "exc") { setAnswer(t.dataset.id, { exc: t.checked }); rerenderItem(t.dataset.id, `#item-${CSS.escape(t.dataset.id)} input[data-act="exc"]`); }
+  });
+
+  document.addEventListener("input", (e) => {
+    const t = e.target;
+    if (t.dataset && t.dataset.act === "note") {
+      const r = state.review, id = t.dataset.id;
+      r.answers[id] = Object.assign({}, r.answers[id] || {}, { note: t.value });
+      changed();
+    }
+    if (t.id === "f-product" && t.value.trim()) { const err = $("#f-product-err"); if (err) err.hidden = true; }
+  });
+
+  document.addEventListener("submit", (e) => {
+    if (e.target.id === "setup-form") { e.preventDefault(); startReview(e.target); }
+  });
+
+  render();
+  initCapabilities();
+})();
+</script>
