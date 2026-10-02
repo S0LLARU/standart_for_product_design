@@ -284,12 +284,65 @@ button, input, textarea { font: inherit; color: inherit; }
   max-width: calc(100% - 32px); z-index: 20;
 }
 
+
+/* ---------- Критерии */
+.sources-line { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.sources-line a { color: inherit; text-underline-offset: 2px; }
+.crits { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--line); }
+.crit { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.crit-text { font-size: 15.5px; }
+.crit-side { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+.yn { min-height: 34px; min-width: 52px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 500; font-size: 14px; }
+.yn:hover { border-color: var(--ink); }
+.yn.y[aria-pressed="true"] { color: var(--ok); background: var(--ok-bg); border-color: var(--ok); font-weight: 600; }
+.yn.n[aria-pressed="true"] { color: var(--bad); background: var(--bad-bg); border-color: var(--bad); font-weight: 600; }
+.crits.off { opacity: 0.45; }
+.ai-mark { font: 500 12px/1 var(--f-mono); padding: 4px 6px; border-radius: 4px; white-space: nowrap; }
+.ai-mark.t { color: var(--ok); background: var(--ok-bg); }
+.ai-mark.f { color: var(--bad); background: var(--bad-bg); }
+.ai-mark.u { color: var(--unk); background: var(--unk-bg); }
+.item-foot { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.item-foot .choices { gap: 6px; }
+.item-foot .choice { min-height: 34px; font-size: 14px; padding: 0 12px; }
+.result { font-size: 14px; color: var(--muted); }
+.result .pill { margin-left: 6px; }
+.tone-partial { color: var(--warn); background: var(--warn-bg); }
+.tone-yes { color: var(--ok); background: var(--ok-bg); }
+.tone-no { color: var(--bad); background: var(--bad-bg); }
+.tone-na, .tone-pending { color: var(--na); background: var(--na-bg); }
+.tone-unknown { color: var(--unk); background: var(--unk-bg); }
+.ai-box { display: grid; gap: 8px; padding: 12px 14px; border-radius: 8px; background: var(--unk-bg); font-size: 15px; }
+.ai-box .ai-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-weight: 600; color: var(--unk); }
+.ai-box.conflict { background: var(--warn-bg); }
+.ai-box.conflict .ai-head { color: var(--warn); }
+.ai-box textarea { width: 100%; min-height: 56px; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; background: var(--surface); resize: vertical; }
+.ai-box .ai-ev { overflow-wrap: anywhere; }
+.ai-hidden { font-size: 14px; color: var(--muted); }
+
+/* ---------- ИИ-проверка */
+.ai-view { display: grid; gap: 20px; }
+.panel { padding: 20px; display: grid; gap: 14px; }
+.panel h2 { font-size: 20px; }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.thumb { position: relative; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--bg); aspect-ratio: 3 / 4; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb button { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--ink); color: var(--surface); cursor: pointer; font-size: 16px; line-height: 1; }
+.drop { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 10px; justify-items: start; }
+.drop.over { border-color: var(--ink); background: var(--sunk); }
+.drop input[type=file] { max-width: 100%; }
+.progress-text { font-size: 15px; }
+.ai-status { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.paste { width: 100%; min-height: 120px; font: 13px/1.5 var(--f-mono); border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: var(--bg); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+
 @media (max-width: 860px) {
   .check { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .side { position: static; }
   .groups { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
   .groups li { flex: none; }
   .groups button { width: auto; white-space: nowrap; border: 1px solid var(--line); }
+  .crit { grid-template-columns: minmax(0, 1fr); }
+  .crit-side { justify-content: flex-start; }
 }
 @media (max-width: 520px) {
   .item { padding: 16px; }
@@ -324,35 +377,17 @@ button, input, textarea { font: inherit; color: inherit; }
   const PRINCIPLES = Object.fromEntries(DATA.principles.map((p) => [p.n, p]));
 
   const MODES = {
-    design: {
-      title: "Дизайн-ревью", ctx: "design", main: true,
-      desc: "Макет или прототип перед передачей в разработку. Главная проверка.",
-      filter: (i) => i.stage !== "Р",
-    },
-    quick: {
-      title: "Быстрая проверка", ctx: "design",
-      desc: "Самые важные пункты, чтобы прогнать макет на ходу. Не заменяет дизайн-ревью.",
-      filter: (i) => i.quick,
-    },
-    release: {
-      title: "Приёмка сборки", ctx: "build",
-      desc: "Работающая сборка против макета перед выпуском.",
-      filter: (i) => i.stage !== "М",
-    },
-    audit: {
-      title: "Аудит продукта", ctx: "build",
-      desc: "Существующий продукт: найти всё, что не дотягивает до стандарта, и составить план.",
-      filter: () => true,
-    },
+    design: { title: "Дизайн-ревью", ctx: "design", main: true, ai: true,
+      desc: "Макет или прототип перед передачей в разработку. Главная проверка.", filter: (i) => i.stage !== "Р" },
+    quick: { title: "Быстрая проверка", ctx: "design", ai: false,
+      desc: "Самые важные пункты, чтобы прогнать макет на ходу. Не заменяет дизайн-ревью.", filter: (i) => i.quick },
+    release: { title: "Приёмка сборки", ctx: "build", ai: true,
+      desc: "Работающая сборка против макета перед выпуском.", filter: (i) => i.stage !== "М" },
+    audit: { title: "Аудит продукта", ctx: "build", ai: true,
+      desc: "Существующий продукт: найти всё, что не дотягивает до стандарта, и составить план.", filter: () => true },
   };
   const MODE_ORDER = ["design", "quick", "release", "audit"];
-  const STATUS = [
-    { k: "yes", label: "Да", ic: "✓" },
-    { k: "partial", label: "Частично", ic: "~" },
-    { k: "no", label: "Нет", ic: "✕" },
-    { k: "na", label: "Н/п", ic: "—" },
-    { k: "unknown", label: "Не проверить", ic: "?" },
-  ];
+  const STATUS_LABEL = { yes: "Да", partial: "Частично", no: "Нет", na: "Н/п", unknown: "Не проверить" };
   const STATUS_MD = { yes: "✅", partial: "⚠️", no: "❌", na: "н/п", unknown: "не проверено" };
   const SEV = [
     { k: "P0", label: "Блокер", desc: "не закончит задачу, потеряет данные или будет введён в заблуждение" },
@@ -360,6 +395,7 @@ button, input, textarea { font: inherit; color: inherit; }
     { k: "P2", label: "Нагрузка", desc: "лишние действия, поиск, запоминание" },
     { k: "P3", label: "Полировка", desc: "мелкие визуальные неточности" },
   ];
+  const SEV_ORDER = { P0: 0, P1: 1, P2: 2, P3: 3 };
   const LEVEL = { "О": "Обязательно", "Р": "Рекомендуется" };
   const STAGE = { "М": "Макет", "М+Р": "Макет и сборка", "Р": "Сборка" };
   const FINDING = (s) => s === "partial" || s === "no";
@@ -371,187 +407,226 @@ button, input, textarea { font: inherit; color: inherit; }
     const m10 = n % 10, m100 = n % 100;
     return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c;
   };
-  const fmtDate = (ts) => {
-    try { return new Date(ts).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { return ""; }
-  };
-  const fmtTime = (ts) => {
-    try { return new Date(ts).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; }
-  };
+  const fmtDate = (ts) => { try { return new Date(ts).toLocaleDateString("ru-RU", { day: "numeric", month: "long", year: "numeric" }); } catch (e) { return ""; } };
+  const fmtTime = (ts) => { try { return new Date(ts).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } };
   const store = {
     get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* хранилище недоступно */ } },
-    del(k) { try { localStorage.removeItem(k); } catch (e) { /* хранилище недоступно */ } },
   };
-  const DRAFT_KEY = "mnl-checklist-draft-v1";
+  const DRAFT_KEY = "mnl-checklist-draft-v2";
   const PREF_KEY = "mnl-checklist-prefs-v1";
 
   let toastTimer = null;
   function toast(msg) {
     const t = $("#toast");
-    t.textContent = msg;
-    t.hidden = false;
+    t.textContent = msg; t.hidden = false;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
+    toastTimer = setTimeout(() => { t.hidden = true; }, 2800);
   }
 
   // ------------------------------------------------------------------ Состояние
   const prefs = Object.assign({ hints: true }, store.get(PREF_KEY) || {});
   const state = { view: "home", review: null, groupIdx: 0, setupMode: null, guideStage: "all", confirmDelete: false, exportOpen: false };
+  const ai = { files: [], urls: [], running: false, done: 0, total: 0, ctl: null, error: "", pasteError: "" };
 
   const draft = store.get(DRAFT_KEY);
   if (draft && draft.review && MODES[draft.review.mode]) {
     state.review = draft.review;
     state.groupIdx = draft.groupIdx || 0;
-    if (draft.view === "check" || draft.view === "summary") state.view = draft.view;
+    if (["check", "summary", "ai"].includes(draft.view)) state.view = draft.view;
   }
   if (location.hash === "#guide") state.view = "guide";
 
   let draftTimer = null;
   function flushDraft() {
-    clearTimeout(draftTimer);
-    draftTimer = null;
+    clearTimeout(draftTimer); draftTimer = null;
     if (state.review) store.set(DRAFT_KEY, { review: state.review, view: state.view, groupIdx: state.groupIdx });
   }
-  function persistDraft() {
-    clearTimeout(draftTimer);
-    draftTimer = setTimeout(flushDraft, 250);
-  }
+  function persistDraft() { clearTimeout(draftTimer); draftTimer = setTimeout(flushDraft, 250); }
   window.addEventListener("pagehide", flushDraft);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushDraft(); });
 
+  // ------------------------------------------------------------------ Пункты и ответы
   function modeItems(mode) { return ITEMS.filter(MODES[mode].filter); }
   function modeGroups(mode) {
     const items = modeItems(mode);
     return GROUPS.map((g) => ({ ...g, items: items.filter((i) => i.group === g.key) })).filter((g) => g.items.length);
   }
-  function ans(id) { return (state.review && state.review.answers[id]) || {}; }
-  function q(item, mode) { return MODES[mode].ctx === "design" ? item.qDesign : item.q; }
-  function how(item, mode) { return MODES[mode].ctx === "design" ? item.howDesign : item.how; }
+  const isDesign = (mode) => MODES[mode].ctx === "design";
+  const q = (item, mode) => (isDesign(mode) ? item.qDesign : item.q);
+  const how = (item, mode) => (isDesign(mode) ? item.howDesign : item.how);
+  const crit = (item, mode) => (isDesign(mode) ? item.criteriaDesign : item.criteria);
+
+  function ans(id, review = state.review) { return (review && review.answers[id]) || {}; }
+
+  // Итог пункта по критериям: все «да» — Да, все «нет» — Нет, вперемешку — Частично.
+  function statusFrom(c, n) {
+    if (!Array.isArray(c)) return undefined;
+    const vals = Array.from({ length: n }, (_, k) => c[k]);
+    if (vals.some((v) => v !== true && v !== false)) return undefined;
+    const yes = vals.filter((v) => v === true).length;
+    return yes === n ? "yes" : yes === 0 ? "no" : "partial";
+  }
+  function statusOf(id, review = state.review) {
+    const a = ans(id, review);
+    if (a.x) return a.x;
+    const n = crit(BY_ID[id], review.mode).length;
+    return statusFrom(a.c, n) || (Array.isArray(a.c) ? undefined : a.s);
+  }
+  function marked(id) {
+    const a = ans(id); const n = crit(BY_ID[id], state.review.mode).length;
+    return Array.isArray(a.c) ? a.c.slice(0, n).filter((v) => v === true || v === false).length : 0;
+  }
+
+  // Ответ ИИ по пункту.
+  function aiOf(id, review = state.review) { return review && review.ai && review.ai.items ? review.ai.items[id] : null; }
+  function aiStatus(id, review = state.review) {
+    const r = aiOf(id, review);
+    if (!r) return undefined;
+    if (r.na) return "na";
+    const c = r.c || [];
+    if (c.some((v) => v === false)) return c.some((v) => v === true) ? "partial" : "no";
+    if (c.length && c.every((v) => v === true)) return "yes";
+    return "unknown";
+  }
+  // Сверка двух проверок по пункту.
+  function reconcile(id, review = state.review) {
+    const a = aiStatus(id, review);
+    if (a === undefined) return "noai";
+    const h = statusOf(id, review);
+    if (!h) return "pending";
+    if (FINDING(a) && FINDING(h)) return "agree";
+    if (FINDING(a)) return ans(id, review).aiReject && ans(id, review).aiReject.trim() ? "rejected" : "conflict";
+    if (FINDING(h)) return "human-only";
+    if (a === "unknown") return "ai-unknown";
+    return "agree";
+  }
 
   // ------------------------------------------------------------------ Вердикт
   function analyze(review) {
     const items = modeItems(review.mode);
-    const a = (id) => review.answers[id] || {};
-    const unanswered = items.filter((i) => !a(i.id).s);
-    const findings = items.filter((i) => FINDING(a(i.id).s));
-    const noSev = findings.filter((i) => !a(i.id).sev);
+    const st = (i) => statusOf(i.id, review);
+    const a = (i) => ans(i.id, review);
+    const unanswered = items.filter((i) => !st(i));
+    const findings = items.filter((i) => FINDING(st(i)));
+    const noSev = findings.filter((i) => !a(i).sev);
     const sevCount = { P0: 0, P1: 0, P2: 0, P3: 0 };
-    findings.forEach((i) => { if (a(i.id).sev) sevCount[a(i.id).sev]++; });
-    const mandatoryOpen = findings.filter((i) => i.level === "О" && !a(i.id).exc);
-    const unknown = items.filter((i) => a(i.id).s === "unknown");
+    findings.forEach((i) => { if (a(i).sev) sevCount[a(i).sev]++; });
+    const mandatoryOpen = findings.filter((i) => i.level === "О" && !a(i).exc);
+    const unknown = items.filter((i) => st(i) === "unknown");
     const unknownMandatory = unknown.filter((i) => i.level === "О");
-    const recommendedOpen = items.filter((i) => i.level === "Р" && !["yes", "na"].includes(a(i.id).s));
-    const exceptions = findings.filter((i) => a(i.id).exc);
-    return { items, unanswered, findings, noSev, sevCount, mandatoryOpen, unknown, unknownMandatory, recommendedOpen, exceptions, answered: items.length - unanswered.length };
+    const recommendedOpen = items.filter((i) => i.level === "Р" && !["yes", "na"].includes(st(i)));
+    const rec = Object.fromEntries(items.map((i) => [i.id, reconcile(i.id, review)]));
+    const by = (k) => items.filter((i) => rec[i.id] === k);
+    const aiDone = !!(review.ai && review.ai.items);
+    const aiFindings = items.filter((i) => FINDING(aiStatus(i.id, review)));
+    return {
+      items, unanswered, findings, noSev, sevCount, mandatoryOpen, unknown, unknownMandatory, recommendedOpen,
+      answered: items.length - unanswered.length, aiDone, aiFindings,
+      conflicts: by("conflict"), rejected: by("rejected"), agree: by("agree"), humanOnly: by("human-only"), aiUnknown: by("ai-unknown"),
+    };
   }
 
   function verdict(review) {
     const x = analyze(review);
+    const m = MODES[review.mode];
     const blockers = x.sevCount.P0 + x.sevCount.P1;
     const incomplete = [];
     if (x.unanswered.length) incomplete.push(`Без ответа: ${x.unanswered.length} ${plural(x.unanswered.length, "пункт", "пункта", "пунктов")}.`);
     if (x.noSev.length) incomplete.push(`У ${x.noSev.length} ${plural(x.noSev.length, "находки", "находок", "находок")} не указана серьёзность.`);
     const mand = x.mandatoryOpen.length ? `Обязательные пункты без исправления или исключения: ${x.mandatoryOpen.map((i) => i.id).join(", ")}.` : null;
-    const unk = x.unknownMandatory.length ? `Не проверены обязательные пункты: ${x.unknownMandatory.map((i) => i.id).join(", ")}. Найдите способ проверить их.` : null;
+    const unk = x.unknownMandatory.length ? `Человек не смог проверить обязательные пункты: ${x.unknownMandatory.map((i) => i.id).join(", ")}. Найдите способ проверить их.` : null;
+    const conflicts = x.conflicts.length ? `Находки ИИ без решения человека: ${x.conflicts.map((i) => i.id).join(", ")}. Подтвердите их или отклоните с причиной.` : null;
+    const noAi = m.ai && !x.aiDone ? "ИИ-проверка ещё не проведена. Без неё вердикт не выносится." : null;
 
     if (review.mode === "design" || review.mode === "quick") {
       const quick = review.mode === "quick";
-      if (review.answers["R2.1"] && review.answers["R2.1"].s === "no") {
-        return { tone: "bad", title: "Вернуться к задаче", detail: ["Непонятны пользователь или момент ценности (R2.1). Сначала заполните описание решения, потом возвращайтесь к экранам."] };
-      }
-      if (blockers) {
-        return {
-          tone: "bad", title: quick ? "Есть блокеры" : "Доработать",
-          detail: [`Блокеров: ${x.sevCount.P0}, серьёзных: ${x.sevCount.P1}. Исправьте их в макете и повторите ${quick ? "проверку" : "ревью"}.`, mand].filter(Boolean),
-        };
-      }
-      if (incomplete.length) return { tone: "neutral", title: quick ? "Проверка не завершена" : "Ревью не завершено", detail: incomplete };
+      if (statusOf("R2.1", review) === "no") return { tone: "bad", title: "Вернуться к задаче", detail: ["Непонятны пользователь или момент ценности (R2.1). Сначала заполните описание решения, потом возвращайтесь к экранам."] };
+      if (blockers) return { tone: "bad", title: quick ? "Есть блокеры" : "Доработать", detail: [`Блокеров: ${x.sevCount.P0}, серьёзных: ${x.sevCount.P1}. Исправьте их в макете и повторите ${quick ? "проверку" : "ревью"}.`, mand, conflicts].filter(Boolean) };
+      if (incomplete.length) return { tone: "neutral", title: quick ? "Проверка не завершена" : "Ревью не завершено", detail: [...incomplete, conflicts].filter(Boolean) };
+      if (conflicts) return { tone: "warn", title: "Сверить с ИИ-проверкой", detail: [conflicts] };
       if (x.mandatoryOpen.length) return { tone: "warn", title: "Доработать", detail: [mand, "Исправьте в макете или оформите исключение с датой пересмотра."] };
       if (unk) return { tone: "neutral", title: "Не хватает проверок", detail: [unk] };
+      if (noAi) return { tone: "neutral", title: "Остаётся ИИ-проверка", detail: ["Проверка человеком пройдена.", noAi] };
       if (quick) return { tone: "ok", title: "Явных блокеров нет", detail: ["Можно идти на полное дизайн-ревью."] };
-      const d = ["Нет открытых P0 и P1, обязательные пункты выполнены или оформлены исключением."];
+      const d = ["Обе проверки проведены. Нет открытых P0 и P1, обязательные пункты выполнены или оформлены исключением."];
       if (x.sevCount.P2 + x.sevCount.P3) d.push(`Находки P2 и P3 (${x.sevCount.P2 + x.sevCount.P3}) заведите задачами с номерами требований.`);
       return { tone: "ok", title: "Готово к передаче", detail: d };
     }
 
     if (review.mode === "release") {
-      if (x.sevCount.P0) return { tone: "bad", title: "Нельзя выпускать", detail: [`Блокеров: ${x.sevCount.P0}. P0 исправляется до выпуска.`] };
-      if (incomplete.length) return { tone: "neutral", title: "Приёмка не завершена", detail: incomplete };
+      if (x.sevCount.P0) return { tone: "bad", title: "Нельзя выпускать", detail: [`Блокеров: ${x.sevCount.P0}. P0 исправляется до выпуска.`, conflicts].filter(Boolean) };
+      if (incomplete.length) return { tone: "neutral", title: "Приёмка не завершена", detail: [...incomplete, conflicts].filter(Boolean) };
+      if (conflicts) return { tone: "warn", title: "Сверить с ИИ-проверкой", detail: [conflicts] };
       if (unk) return { tone: "neutral", title: "Не хватает проверок", detail: [unk] };
       if (x.mandatoryOpen.length) return { tone: "warn", title: "Решить до выпуска", detail: [mand, "Исправьте или оформите исключение с датой пересмотра."] };
-      const d = ["Блокеров нет, обязательные пункты выполнены или оформлены исключением."];
+      if (noAi) return { tone: "neutral", title: "Остаётся ИИ-проверка", detail: ["Проверка человеком пройдена.", noAi] };
+      const d = ["Обе проверки проведены. Блокеров нет, обязательные пункты выполнены или оформлены исключением."];
       if (x.sevCount.P1) d.push(`Серьёзные находки (${x.sevCount.P1}) исправить в ближайшем цикле.`);
       return { tone: "ok", title: "Можно выпускать", detail: d };
     }
 
     // Аудит
-    const pre = incomplete.length ? "Предварительно · " : "";
-    const tail = incomplete.length ? incomplete : [];
-    if (x.sevCount.P0) return { tone: "bad", title: pre + "Ниже уровня 1", detail: [`Блокеров: ${x.sevCount.P0}. Сначала исправьте их.`, ...tail] };
-    if (x.sevCount.P1 || x.mandatoryOpen.length) {
-      return { tone: "warn", title: pre + "Уровень 1 · Работает", detail: [`Для уровня 2 закройте серьёзные находки (${x.sevCount.P1}) и обязательные пункты.`, mand, ...tail].filter(Boolean) };
-    }
+    const pending = [...incomplete, conflicts, noAi].filter(Boolean);
+    const pre = pending.length ? "Предварительно · " : "";
+    if (x.sevCount.P0) return { tone: "bad", title: pre + "Ниже уровня 1", detail: [`Блокеров: ${x.sevCount.P0}. Сначала исправьте их.`, ...pending] };
+    if (x.sevCount.P1 || x.mandatoryOpen.length) return { tone: "warn", title: pre + "Уровень 1 · Работает", detail: [`Для уровня 2 закройте серьёзные находки (${x.sevCount.P1}) и обязательные пункты.`, mand, ...pending].filter(Boolean) };
     if (x.recommendedOpen.length || !review.peopleChecked) {
       const need = [];
       if (x.recommendedOpen.length) need.push(`рекомендованные пункты: ${x.recommendedOpen.map((i) => i.id).join(", ")}`);
       if (!review.peopleChecked) need.push("подтверждение наблюдением за людьми");
-      return { tone: "ok", title: pre + "Уровень 2 · Понятно и честно", detail: [`Для уровня 3 не хватает: ${need.join("; ")}.`, unk, ...tail].filter(Boolean) };
+      return { tone: "ok", title: pre + "Уровень 2 · Понятно и честно", detail: [`Для уровня 3 не хватает: ${need.join("; ")}.`, unk, ...pending].filter(Boolean) };
     }
-    return { tone: "ok", title: pre + "Уровень 3 · Меньше, но лучше", detail: ["Все требования выполнены, результат подтверждён наблюдением за людьми.", unk, ...tail].filter(Boolean) };
+    return { tone: "ok", title: pre + "Уровень 3 · Меньше, но лучше", detail: ["Все требования выполнены, результат подтверждён наблюдением за людьми.", unk, ...pending].filter(Boolean) };
   }
 
   // ------------------------------------------------------------------ Возможности платформы
-  const cap = { db: null, user: null, downloads: null, myId: null, history: [], historyState: "loading", names: {} };
+  const cap = { db: null, user: null, downloads: null, sample: null, limits: null, myId: null, history: [], historyState: "loading" };
   let saveChain = Promise.resolve();
   let teamTimer = null;
   let saveStatus = "";
 
   async function initCapabilities() {
-    if (!window.claude || typeof window.claude.use !== "function") {
-      cap.historyState = "off";
-      refreshHistory();
-      return;
-    }
-    const [db, user, downloads] = await Promise.all([
-      window.claude.use("db").catch(() => null),
-      window.claude.use("user").catch(() => null),
-      window.claude.use("downloads").catch(() => null),
-    ]);
-    cap.db = db; cap.user = user; cap.downloads = downloads;
+    if (!window.claude || typeof window.claude.use !== "function") { cap.historyState = "off"; refreshHistory(); return; }
+    const use = (n) => window.claude.use(n).catch(() => null);
+    const [db, user, downloads, sample] = await Promise.all([use("db"), use("user"), use("downloads"), use("sample")]);
+    Object.assign(cap, { db, user, downloads, sample });
+    if (sample) { try { cap.limits = await sample.limits(); } catch (e) { cap.limits = null; } }
     if (user) { try { cap.myId = await user.id(); } catch (e) { cap.myId = null; } }
     if (db) {
       db.collection("reviews").orderBy("updatedAt", "desc").limit(100).onSnapshot(
-        (snap) => {
-          cap.history = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-          cap.historyState = "ready";
-          refreshHistory();
-        },
+        (snap) => { cap.history = snap.docs.map((d) => ({ id: d.id, ...d.data() })); cap.historyState = "ready"; refreshHistory(); },
         () => { cap.historyState = "error"; refreshHistory(); }
       );
-    } else {
-      cap.historyState = "off";
-    }
+    } else cap.historyState = "off";
     refreshHistory();
-    if (state.view === "summary") render();
+    if (state.view === "summary" || state.view === "ai") render();
   }
 
   function serialize(r) {
-    const x = analyze(r);
-    const v = verdict(r);
+    const x = analyze(r), v = verdict(r);
     return {
-      mode: r.mode, product: r.product, scenario: r.scenario || "", link: r.link || "", people: r.people || "",
-      answers: Object.entries(r.answers).map(([id, a]) => ({ id, s: a.s || "", sev: a.sev || "", note: a.note || "", exc: !!a.exc })),
-      peopleChecked: !!r.peopleChecked,
-      createdAt: r.createdAt, updatedAt: Date.now(), authorId: r.authorId || cap.myId || "",
-      std: DATA.version, verdict: v.title, tone: v.tone, counts: x.sevCount, answered: x.answered, total: x.items.length,
+      mode: r.mode, product: r.product, scenario: r.scenario || "", link: r.link || "", people: r.people || "", aiContext: r.aiContext || "",
+      answers: Object.entries(r.answers).map(([id, a]) => ({ id, c: Array.isArray(a.c) ? a.c.map((v) => (v === true || v === false ? v : null)) : [], x: a.x || "", s: a.s || "", sev: a.sev || "", note: a.note || "", exc: !!a.exc, aiReject: a.aiReject || "" })),
+      ai: r.ai ? { at: r.ai.at, source: r.ai.source, summary: r.ai.summary || "", items: Object.entries(r.ai.items || {}).map(([id, i]) => ({ id, c: i.c, na: !!i.na, sev: i.sev || "", ev: i.ev || "" })) } : null,
+      peopleChecked: !!r.peopleChecked, createdAt: r.createdAt, updatedAt: Date.now(), authorId: r.authorId || cap.myId || "",
+      std: DATA.version, verdict: v.title, tone: v.tone, counts: x.sevCount, answered: x.answered, total: x.items.length, aiDone: x.aiDone,
     };
   }
   function deserialize(id, d) {
     const answers = {};
-    (d.answers || []).forEach((a) => { if (BY_ID[a.id]) answers[a.id] = { s: a.s || undefined, sev: a.sev || undefined, note: a.note || "", exc: !!a.exc }; });
+    (d.answers || []).forEach((a) => {
+      if (!BY_ID[a.id]) return;
+      answers[a.id] = { c: Array.isArray(a.c) && a.c.length ? a.c.map((v) => (v === true || v === false ? v : undefined)) : undefined, x: a.x || undefined, s: a.s || undefined, sev: a.sev || undefined, note: a.note || "", exc: !!a.exc, aiReject: a.aiReject || "" };
+    });
+    let aiRes = null;
+    if (d.ai && Array.isArray(d.ai.items)) {
+      aiRes = { at: d.ai.at, source: d.ai.source, summary: d.ai.summary || "", items: {} };
+      d.ai.items.forEach((i) => { if (BY_ID[i.id]) aiRes.items[i.id] = { c: i.c || [], na: !!i.na, sev: i.sev || null, ev: i.ev || "" }; });
+    }
     return {
-      id, mode: MODES[d.mode] ? d.mode : "design", product: d.product || "Без названия", scenario: d.scenario || "", link: d.link || "",
-      people: d.people || "", answers, peopleChecked: !!d.peopleChecked, createdAt: d.createdAt || Date.now(), authorId: d.authorId || "", savedToTeam: true,
+      id, mode: MODES[d.mode] ? d.mode : "design", product: d.product || "Без названия", scenario: d.scenario || "", link: d.link || "", people: d.people || "",
+      aiContext: d.aiContext || "", answers, ai: aiRes, peopleChecked: !!d.peopleChecked, createdAt: d.createdAt || Date.now(), authorId: d.authorId || "", savedToTeam: true,
     };
   }
 
@@ -565,17 +640,12 @@ button, input, textarea { font: inherit; color: inherit; }
     saveStatus = "saving"; updateSaveUi();
     saveChain = saveChain.then(() => ref.set(body)).then(
       () => { r.savedToTeam = true; saveStatus = "saved:" + Date.now(); updateSaveUi(); persistDraft(); },
-      (e) => {
-        const code = e && e.code;
-        saveStatus = code === "invalid_argument" ? "denied" : code === "quota_exceeded" ? "quota" : "error";
-        updateSaveUi();
-      }
+      (e) => { const code = e && e.code; saveStatus = code === "invalid_argument" ? "denied" : code === "quota_exceeded" ? "quota" : "error"; updateSaveUi(); }
     );
   }
   function scheduleTeamSave() {
     if (!cap.db || !state.review || !state.review.savedToTeam) return;
-    clearTimeout(teamTimer);
-    teamTimer = setTimeout(teamSaveNow, 1500);
+    clearTimeout(teamTimer); teamTimer = setTimeout(teamSaveNow, 1500);
   }
   function changed() { persistDraft(); scheduleTeamSave(); }
 
@@ -588,31 +658,26 @@ button, input, textarea { font: inherit; color: inherit; }
     return "Не удалось сохранить. Проверьте соединение и нажмите «Сохранить» ещё раз.";
   }
   function updateSaveUi() {
-    const el = $("#save-status");
-    if (el) el.textContent = saveText();
+    const el = $("#save-status"); if (el) el.textContent = saveText();
     const side = $("#side-save");
     if (side) side.textContent = state.review && state.review.savedToTeam ? (saveStatus === "saving" ? "Сохраняется…" : "В истории команды") : "Черновик на этом устройстве";
   }
 
   // ------------------------------------------------------------------ Отрисовка
   const app = $("#app");
-
   function setNav() {
     $("#nav-home").setAttribute("aria-current", state.view === "guide" ? "false" : "page");
     $("#nav-guide").setAttribute("aria-current", state.view === "guide" ? "page" : "false");
   }
-
   function render(focusSel) {
     setNav();
-    if (state.view === "home") app.innerHTML = renderHome();
-    else if (state.view === "setup") app.innerHTML = renderSetup();
-    else if (state.view === "check") app.innerHTML = renderCheck();
-    else if (state.view === "summary") app.innerHTML = renderSummary();
-    else if (state.view === "guide") app.innerHTML = renderGuide();
+    const views = { home: renderHome, setup: renderSetup, check: renderCheck, summary: renderSummary, guide: renderGuide, ai: renderAi };
+    app.innerHTML = (views[state.view] || renderHome)();
     if (state.view === "home") refreshHistory();
     updateSaveUi();
     if (focusSel) { const el = $(focusSel); if (el) el.focus({ preventScroll: true }); }
   }
+  const pill = (tone, text) => `<span class="pill tone-${tone}">${esc(text)}</span>`;
 
   function renderHome() {
     const r = state.review;
@@ -626,7 +691,7 @@ button, input, textarea { font: inherit; color: inherit; }
           <div class="info">
             <span class="eyebrow">${esc(MODES[r.mode].title)}</span>
             <strong>${esc(r.product)}${r.scenario ? " · " + esc(r.scenario) : ""}</strong>
-            <span class="muted">Отвечено ${x.answered} из ${x.items.length} · находок ${x.findings.length}${r.savedToTeam ? " · в истории команды" : " · черновик на этом устройстве"}</span>
+            <span class="muted">Отвечено ${x.answered} из ${x.items.length} · находок ${x.findings.length}${MODES[r.mode].ai ? (x.aiDone ? " · ИИ-проверка проведена" : " · ИИ-проверки ещё нет") : ""}${r.savedToTeam ? " · в истории команды" : ""}</span>
           </div>
           <div class="row">
             <button class="btn" type="button" data-act="open-summary">Итог</button>
@@ -640,7 +705,7 @@ button, input, textarea { font: inherit; color: inherit; }
       return `<button class="mode${m.main ? " main" : ""}" type="button" data-act="new" data-mode="${k}">
         ${m.main ? '<span class="badge-main">Главная проверка</span>' : ""}
         <h3>${esc(m.title)}</h3>
-        <span class="count">${n} ${plural(n, "пункт", "пункта", "пунктов")}</span>
+        <span class="count">${n} ${plural(n, "пункт", "пункта", "пунктов")} · ${m.ai ? "человек + ИИ" : "человек"}</span>
         <p>${esc(m.desc)}</p>
       </button>`;
     }).join("");
@@ -648,8 +713,8 @@ button, input, textarea { font: inherit; color: inherit; }
     <div class="home">
       <section class="hero">
         <span class="eyebrow">Стандарт дизайна · версия ${esc(DATA.version)}</span>
-        <h1>Пройдите продукт по стандарту</h1>
-        <p>Десять принципов Дитера Рамса, разложенные на ${ITEMS.length} ${plural(ITEMS.length, "проверку", "проверки", "проверок")}. Отмечайте пункт за пунктом — в конце будет вердикт, список находок и отчёт, который можно отдать команде.</p>
+        <h1>Две проверки по одному списку</h1>
+        <p>Принципы Дитера Рамса, подход Джони Айва и Apple HIG, разложенные на ${ITEMS.length} ${plural(ITEMS.length, "пункт", "пункта", "пунктов")}. У каждого пункта — короткие критерии с ответом «да» или «нет». Человек отмечает их по прототипу, ИИ — по скриншотам. В конце — сверка, вердикт и отчёт.</p>
         <p class="motto">«Меньше, но лучше» <span>— Дитер Рамс</span></p>
       </section>
       ${draftHtml}
@@ -677,8 +742,8 @@ button, input, textarea { font: inherit; color: inherit; }
       const finds = ["P0", "P1", "P2", "P3"].map((k) => (c[k] ? `${k}: ${c[k]}` : "")).filter(Boolean).join(", ");
       return `<button type="button" class="history-row" data-act="open-history" data-id="${esc(h.id)}">
         <span class="h-title">${esc(h.product || "Без названия")}${h.scenario ? " · " + esc(h.scenario) : ""}</span>
-        <span class="h-meta">${esc(mode)} · ${esc(fmtDate(h.updatedAt))}${h.authorId ? ` · <span data-author="${esc(h.authorId)}"></span>` : ""}${finds ? " · " + esc(finds) : ""}</span>
-        <span class="h-verdict"><span class="pill tone-${esc(h.tone || "neutral")}">${esc(h.verdict || "")}</span></span>
+        <span class="h-meta">${esc(mode)} · ${esc(fmtDate(h.updatedAt))}${h.authorId ? ` · <span data-author="${esc(h.authorId)}"></span>` : ""}${finds ? " · " + esc(finds) : ""}${MODES[h.mode] && MODES[h.mode].ai ? (h.aiDone ? " · ИИ ✓" : " · без ИИ") : ""}</span>
+        <span class="h-verdict">${pill(esc(h.tone || "neutral"), h.verdict || "")}</span>
       </button>`;
     }).join("") + "</div>";
     resolveAuthors();
@@ -704,7 +769,7 @@ button, input, textarea { font: inherit; color: inherit; }
     <form class="setup" id="setup-form" novalidate>
       <button type="button" class="linkbtn" data-go="home">← Все проверки</button>
       <div class="stack" style="gap:8px">
-        <span class="eyebrow">${n} ${plural(n, "пункт", "пункта", "пунктов")}</span>
+        <span class="eyebrow">${n} ${plural(n, "пункт", "пункта", "пунктов")} · ${m.ai ? "человек + ИИ" : "человек"}</span>
         <h1>${esc(m.title)}</h1>
         <p class="muted">${esc(m.desc)}</p>
       </div>
@@ -735,14 +800,15 @@ button, input, textarea { font: inherit; color: inherit; }
     const r = state.review, groups = modeGroups(r.mode), x = analyze(r);
     const pct = x.items.length ? Math.round((x.answered / x.items.length) * 100) : 0;
     const list = groups.map((g, idx) => {
-      const done = g.items.filter((i) => ans(i.id).s).length;
-      const flags = g.items.filter((i) => FINDING(ans(i.id).s)).length;
-      const full = done === g.items.length;
-      return `<li><button type="button" data-act="group" data-idx="${idx}" ${idx === state.groupIdx && state.view === "check" ? 'aria-current="step"' : ""} class="${full ? "g-done" : ""}">
-        <span>${esc(g.title)}${flags ? ` <span class="g-flag" aria-label="находок: ${flags}">●</span>` : ""}</span>
+      const done = g.items.filter((i) => statusOf(i.id)).length;
+      const flags = g.items.filter((i) => FINDING(statusOf(i.id))).length;
+      const conf = g.items.filter((i) => reconcile(i.id) === "conflict").length;
+      return `<li><button type="button" data-act="group" data-idx="${idx}" ${idx === state.groupIdx && state.view === "check" ? 'aria-current="step"' : ""} class="${done === g.items.length ? "g-done" : ""}">
+        <span>${esc(g.title)}${flags ? ` <span class="g-flag" aria-label="находок: ${flags}">●</span>` : ""}${conf ? ` <span class="g-flag" style="color:var(--warn)" aria-label="расхождений с ИИ: ${conf}">◆</span>` : ""}</span>
         <span class="g-count">${done}/${g.items.length}</span>
       </button></li>`;
     }).join("");
+    const aiLabel = !MODES[r.mode].ai ? "по желанию" : ai.running ? "идёт…" : x.aiDone ? (x.conflicts.length ? `расхождений ${x.conflicts.length}` : "проведена") : "не проведена";
     return `
     <aside class="side" aria-label="Ход проверки">
       <div class="review-name">
@@ -755,49 +821,108 @@ button, input, textarea { font: inherit; color: inherit; }
         <div class="progress-label"><span>Отвечено ${x.answered} из ${x.items.length}</span><span>Находок ${x.findings.length}</span></div>
       </div>
       <ul class="groups">${list}
+        <li><button type="button" data-act="open-ai" ${state.view === "ai" ? 'aria-current="step"' : ""}><span>ИИ-проверка</span><span class="g-count">${esc(aiLabel)}</span></button></li>
         <li><button type="button" data-act="open-summary" ${state.view === "summary" ? 'aria-current="step"' : ""}><span>Итог и отчёт</span><span class="g-count">→</span></button></li>
       </ul>
       <label class="toggle"><input type="checkbox" id="hints-toggle" ${prefs.hints ? "checked" : ""}> Показывать подсказки</label>
     </aside>`;
   }
 
+  function sourcesHtml(i) {
+    const parts = [`<span>Рамс ${i.principle} · ${esc(PRINCIPLES[i.principle].short)}</span>`];
+    i.ive.forEach((s) => parts.push(`<span title="${esc(s.title)}">Айв ${s.n}</span>`));
+    i.hig.forEach((s) => parts.push(`<a href="${esc(s.url)}" target="_blank" rel="noopener" title="${esc(s.title)}">HIG ${esc(s.key)}</a>`));
+    i.w3c.forEach((s) => parts.push(`<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>`));
+    return `<div class="sources-line" aria-label="Основания">${parts.join("")}</div>`;
+  }
+
+  function aiBoxHtml(i) {
+    const r = aiOf(i.id);
+    if (!r) return "";
+    const rec = reconcile(i.id);
+    if (rec === "pending") return '<p class="ai-hidden">Ответ ИИ по этому пункту откроется после вашего ответа — так проверки остаются независимыми.</p>';
+    const st = aiStatus(i.id);
+    const head = `ИИ: ${pill(st, STATUS_LABEL[st] || "Не проверить")}${r.sev ? ` <span class="plate">${esc(r.sev)}</span>` : ""}`;
+    const ev = r.ev ? `<p class="ai-ev">${esc(r.ev)}</p>` : "";
+    if (rec === "conflict" || rec === "rejected") {
+      const a = ans(i.id);
+      return `<div class="ai-box conflict">
+        <div class="ai-head">${rec === "conflict" ? "Расхождение с ИИ" : "Находка ИИ отклонена"} · ${head}</div>
+        ${ev}
+        <p>${rec === "conflict" ? "ИИ считает, что здесь есть проблема. Перепроверьте критерии, где у ИИ стоит ✕. Если ИИ ошибается, объясните почему:" : "Причина, по которой находка ИИ отклонена:"}</p>
+        <label class="hidden-text" for="rej-${i.id}">Почему ИИ ошибается</label>
+        <textarea id="rej-${i.id}" data-act="ai-reject" data-id="${i.id}" placeholder="Например: на экране 3 состояние ошибки есть, ИИ его не увидел">${esc(a.aiReject || "")}</textarea>
+      </div>`;
+    }
+    const note = rec === "agree" ? "Совпадает с вашим ответом." : rec === "human-only" ? "ИИ этого не увидел. Ваша находка остаётся." : rec === "ai-unknown" ? "ИИ не смог проверить пункт по материалам." : "";
+    return `<div class="ai-box"><div class="ai-head">${head}</div>${ev}<p class="muted" style="font-size:14px">${note}</p></div>`;
+  }
+
   function itemHtml(i) {
-    const r = state.review, a = ans(i.id), m = MODES[r.mode];
-    const design = m.ctx === "design";
-    const st = STATUS.map((s) => `<button type="button" class="choice s-${s.k}" data-act="status" data-id="${i.id}" data-v="${s.k}" aria-pressed="${a.s === s.k}"><span class="ic" aria-hidden="true">${s.ic}</span>${s.label}</button>`).join("");
+    const r = state.review, a = ans(i.id), mode = r.mode;
+    const cs = crit(i, mode);
+    const st = statusOf(i.id);
+    const revealed = !!st;
+    const aiR = aiOf(i.id);
+    const critRows = cs.map((c, n) => {
+      const v = Array.isArray(a.c) ? a.c[n] : undefined;
+      let mark = "";
+      if (aiR && revealed && !aiR.na) {
+        const av = (aiR.c || [])[n];
+        mark = av === true ? '<span class="ai-mark t" title="Оценка ИИ">ИИ ✓</span>' : av === false ? '<span class="ai-mark f" title="Оценка ИИ">ИИ ✕</span>' : '<span class="ai-mark u" title="ИИ не смог проверить">ИИ ?</span>';
+      }
+      const dis = a.x ? "disabled" : "";
+      return `<li class="crit">
+        <span class="crit-text" id="c-${i.id}-${n}">${esc(c)}</span>
+        <span class="crit-side" role="group" aria-labelledby="c-${i.id}-${n}">
+          ${mark}
+          <button type="button" class="yn y" data-act="crit" data-id="${i.id}" data-n="${n}" data-v="1" aria-pressed="${v === true}" ${dis}>Да</button>
+          <button type="button" class="yn n" data-act="crit" data-id="${i.id}" data-n="${n}" data-v="0" aria-pressed="${v === false}" ${dis}>Нет</button>
+        </span>
+      </li>`;
+    }).join("");
     const sevSel = SEV.find((s) => s.k === a.sev);
-    const sev = FINDING(a.s) ? `
+    const sev = FINDING(st) ? `
       <div class="sev-block">
-        <span class="sev-label" id="sev-${i.id}">Серьёзность <span>— что случится с человеком${design ? ", если реализовать как есть" : ""}</span></span>
+        <span class="sev-label" id="sev-${i.id}">Серьёзность <span>— что случится с человеком${isDesign(mode) ? ", если реализовать как есть" : ""}</span></span>
         <div class="choices" role="group" aria-labelledby="sev-${i.id}">
           ${SEV.map((s) => `<button type="button" class="choice sev ${s.k}" data-act="sev" data-id="${i.id}" data-v="${s.k}" aria-pressed="${a.sev === s.k}"><span class="code">${s.k}</span>${s.label}</button>`).join("")}
         </div>
         <span class="sev-desc">${sevSel ? esc(sevSel.label + ": " + sevSel.desc + ".") : "Выберите серьёзность — от неё зависит вердикт."}</span>
       </div>` : "";
-    const exc = FINDING(a.s) && i.level === "О"
-      ? `<label class="exc"><input type="checkbox" data-act="exc" data-id="${i.id}" ${a.exc ? "checked" : ""}> Оформлено исключение из стандарта</label>` : "";
+    const exc = FINDING(st) && i.level === "О" ? `<label class="exc"><input type="checkbox" data-act="exc" data-id="${i.id}" ${a.exc ? "checked" : ""}> Оформлено исключение из стандарта</label>` : "";
     const hint = prefs.hints ? `
       <div class="hint-box">
-        <p><span class="h-label">Как проверить. </span>${esc(how(i, r.mode))}</p>
+        <p><span class="h-label">Как проверить. </span>${esc(how(i, mode))}</p>
         <p class="red"><span class="h-label">Тревожный признак. </span>${esc(i.red)}</p>
         <p class="req-line">Требование ${esc(i.id)}: ${esc(i.text)}</p>
       </div>` : "";
+    const resultText = st ? pill(st, STATUS_LABEL[st]) : `<span>отмечено ${marked(i.id)} из ${cs.length}</span>`;
     return `
-    <article class="card item${a.s ? " answered" : ""}" id="item-${i.id}" aria-labelledby="q-${i.id}">
+    <article class="card item${st ? " answered" : ""}" id="item-${i.id}" aria-labelledby="q-${i.id}">
       <div class="item-top">
         <span class="plate">${i.id}</span>
-        <span class="tag">${esc(PRINCIPLES[i.principle].short)}</span>
         <span class="tag">${LEVEL[i.level]}</span>
         <span class="tag">${STAGE[i.stage]}</span>
+        ${i.quick ? '<span class="tag">⚡ быстрая проверка</span>' : ""}
       </div>
-      <h3 id="q-${i.id}">${esc(q(i, r.mode))}</h3>
-      ${design && i.stage === "М+Р" ? '<p class="design-note">Поведение видно только в сборке. Здесь проверяем, что оно спроектировано и описано в макете.</p>' : ""}
+      <h3 id="q-${i.id}">${esc(q(i, mode))}</h3>
+      ${sourcesHtml(i)}
+      ${isDesign(mode) && i.stage === "М+Р" ? '<p class="design-note">Поведение видно только в сборке. Здесь проверяем, что оно спроектировано и описано в макете.</p>' : ""}
       ${hint}
-      <div class="choices" role="group" aria-label="Результат проверки ${i.id}">${st}</div>
+      <ul class="crits${a.x ? " off" : ""}" aria-label="Критерии">${critRows}</ul>
+      <div class="item-foot">
+        <div class="choices" role="group" aria-label="Пункт целиком">
+          <button type="button" class="choice s-na" data-act="x" data-id="${i.id}" data-v="na" aria-pressed="${a.x === "na"}">— Не применимо</button>
+          <button type="button" class="choice s-unknown" data-act="x" data-id="${i.id}" data-v="unknown" aria-pressed="${a.x === "unknown"}">? Не проверить</button>
+        </div>
+        <span class="result">Итог пункта: ${resultText}</span>
+      </div>
       ${sev}
       ${exc}
+      ${aiBoxHtml(i)}
       <div class="note">
-        <label for="note-${i.id}">${FINDING(a.s) ? "Что не так — где и как воспроизвести" : "Заметка"}</label>
+        <label for="note-${i.id}">${FINDING(st) ? "Что не так — где и как воспроизвести" : a.x === "na" ? "Почему не применимо" : "Заметка"}</label>
         <textarea id="note-${i.id}" data-act="note" data-id="${i.id}" rows="2">${esc(a.note || "")}</textarea>
       </div>
     </article>`;
@@ -805,10 +930,12 @@ button, input, textarea { font: inherit; color: inherit; }
 
   function renderCheck() {
     const r = state.review, groups = modeGroups(r.mode);
-    if (state.groupIdx >= groups.length) state.groupIdx = groups.length - 1;
-    if (state.groupIdx < 0) state.groupIdx = 0;
+    state.groupIdx = Math.max(0, Math.min(state.groupIdx, groups.length - 1));
     const g = groups[state.groupIdx];
     const last = state.groupIdx === groups.length - 1;
+    const nextBtn = last
+      ? (MODES[r.mode].ai ? '<button class="btn primary" type="button" data-act="open-ai">К ИИ-проверке</button>' : '<button class="btn primary" type="button" data-act="open-summary">К итогу</button>')
+      : `<button class="btn primary" type="button" data-act="group" data-idx="${state.groupIdx + 1}">${esc(groups[state.groupIdx + 1].title)} →</button>`;
     return `
     <div class="check">
       ${sideHtml()}
@@ -816,50 +943,228 @@ button, input, textarea { font: inherit; color: inherit; }
         <div class="group-head">
           <span class="eyebrow">Блок ${state.groupIdx + 1} из ${groups.length}</span>
           <h2 id="group-h" tabindex="-1">${esc(g.title)}</h2>
-          <p>${esc(g.intro)}</p>
+          <p>${esc(g.intro)} Отметьте каждый критерий «Да» или «Нет» — итог пункта посчитается сам.</p>
         </div>
         <div class="items">${g.items.map(itemHtml).join("")}</div>
         <div class="pager">
           ${state.groupIdx > 0 ? `<button class="btn" type="button" data-act="group" data-idx="${state.groupIdx - 1}">← ${esc(groups[state.groupIdx - 1].title)}</button>` : "<span></span>"}
-          ${last ? '<button class="btn primary" type="button" data-act="open-summary">К итогу</button>'
-                 : `<button class="btn primary" type="button" data-act="group" data-idx="${state.groupIdx + 1}">${esc(groups[state.groupIdx + 1].title)} →</button>`}
+          ${nextBtn}
         </div>
       </section>
     </div>`;
   }
 
+  // ------------------------------------------------------------------ ИИ-проверка
+  function aiContextText(r) {
+    return [
+      `Продукт: ${r.product}`,
+      r.scenario ? `Что проверяем: ${r.scenario}` : "",
+      r.link ? `Ссылка: ${r.link}` : "",
+      r.aiContext ? `Описание и аннотации от команды:\n${r.aiContext}` : "",
+      `Приложено изображений: ${ai.files.length || "см. вложения"}`,
+    ].filter(Boolean).join("\n");
+  }
+  function aiPrompt(mode, items, context) {
+    const m = MODES[mode], p = DATA.protocol, key = m.ctx === "design" ? "aiDesign" : "aiBuild";
+    const intro = p.intro.split("{mode}").join(m.title).split("{materials}").join(p["materials_" + m.ctx]).split("{version}").join(DATA.version);
+    return [intro, p.rules, "Контекст от команды:\n" + context, "Пункты для проверки:", items.map((i) => i[key]).join("\n\n"), p.format].join("\n\n") + "\n";
+  }
+  function chunks(items, size) {
+    const out = [];
+    for (let k = 0; k < items.length; k += size) out.push(items.slice(k, k + size));
+    return out;
+  }
+  function normalizeAi(obj, items) {
+    if (!obj || !Array.isArray(obj.items)) throw new Error("В ответе нет списка items.");
+    const got = {};
+    obj.items.forEach((x) => { if (x && BY_ID[x.id]) got[x.id] = x; });
+    const res = {};
+    let known = 0;
+    items.forEach((i) => {
+      const n = crit(i, state.review.mode).length;
+      const x = got[i.id];
+      if (!x) { res[i.id] = { c: Array(n).fill(null), na: false, sev: null, ev: "ИИ не ответил по этому пункту." }; return; }
+      known++;
+      const c = Array.from({ length: n }, (_, k) => (Array.isArray(x.criteria) ? (x.criteria[k] === true ? true : x.criteria[k] === false ? false : null) : null));
+      const sev = SEV_ORDER[x.severity] !== undefined ? x.severity : null;
+      res[i.id] = { c, na: !!x.na, sev: c.includes(false) ? (sev || "P2") : null, ev: String(x.evidence || "").slice(0, 800) };
+    });
+    if (!known) throw new Error("Ни один пункт из ответа не совпал с пунктами этой проверки.");
+    return { items: res, summary: typeof obj.summary === "string" ? obj.summary.slice(0, 1500) : "" };
+  }
+  function applyAi(result, source) {
+    const r = state.review;
+    r.ai = { at: Date.now(), source, summary: result.summary, items: result.items };
+    changed();
+  }
+
+  async function runAi() {
+    const r = state.review;
+    if (!cap.sample || ai.running) return;
+    const items = modeItems(r.mode);
+    const parts = chunks(items, 18);
+    ai.running = true; ai.done = 0; ai.total = parts.length; ai.error = ""; ai.ctl = new AbortController();
+    render();
+    const context = aiContextText(r);
+    const opts = { modelTier: "complex", signal: ai.ctl.signal, cache: false };
+    if (ai.files.length) opts.images = ai.files.slice();
+    try {
+      const answers = await Promise.all(parts.map((part) =>
+        cap.sample.json(aiPrompt(r.mode, part, context), opts).then((res) => { ai.done++; updateAiProgress(); return normalizeAi(res, part); })
+      ));
+      const merged = { items: {}, summary: answers.map((a) => a.summary).filter(Boolean).join(" ") };
+      answers.forEach((a) => Object.assign(merged.items, a.items));
+      applyAi(merged, "Запущена на этой странице");
+      toast("ИИ-проверка готова. Ответы ИИ открываются в пунктах после ваших.");
+    } catch (e) {
+      const code = e && e.code;
+      const msg = {
+        cancelled: "", not_granted: "Запуск ИИ отсюда не разрешён. Используйте способ «Claude Code или чат» ниже.",
+        sampling_disabled: "Claude недоступен для этого аккаунта. Используйте способ ниже.", images_unavailable: "Здесь нельзя отправить изображения. Используйте способ ниже.",
+        image_rejected: "Одно из изображений не подошло: слишком большое или неподходящего формата.", rate_limited: "Слишком много запросов. Подождите и запустите снова.",
+        prompt_too_large: "Задание получилось слишком большим. Сократите описание.", invalid_json: "ИИ ответил не в том формате. Запустите ещё раз.",
+        session_expired: "Нужно снова войти в claude.ai.", refused: "ИИ отказался проверять эти материалы. Проверьте, что на изображениях только интерфейс.",
+      }[code];
+      ai.error = msg === undefined ? (e && e.message && !code ? e.message : "Не удалось провести проверку. Попробуйте ещё раз.") : msg;
+    } finally {
+      ai.running = false; ai.ctl = null;
+      if (state.view === "ai") render(); else { const side = $(".side"); if (side) side.outerHTML = sideHtml(); }
+    }
+  }
+  function updateAiProgress() {
+    const el = $("#ai-progress");
+    if (el) el.textContent = `Готово частей: ${ai.done} из ${ai.total}. Обычно это занимает несколько минут.`;
+  }
+  function addFiles(list) {
+    const lim = cap.limits && cap.limits.images;
+    const types = lim ? lim.mediaTypes : ["image/png", "image/jpeg", "image/webp", "image/gif"];
+    const max = lim ? lim.maxCount : 20;
+    let skipped = 0;
+    Array.from(list).forEach((f) => {
+      if (!types.includes(f.type) || (lim && f.size > lim.maxInputBytes) || ai.files.length >= max) { skipped++; return; }
+      ai.files.push(f); ai.urls.push(URL.createObjectURL(f));
+    });
+    if (skipped) toast(`Пропущено файлов: ${skipped}. Подходят изображения ${types.map((t) => t.split("/")[1]).join(", ")}, не больше ${max} штук.`);
+    render();
+  }
+  function removeFile(k) {
+    try { URL.revokeObjectURL(ai.urls[k]); } catch (e) { /* нечего освобождать */ }
+    ai.files.splice(k, 1); ai.urls.splice(k, 1); render();
+  }
+  function parsePasted(text) {
+    let t = String(text || "").trim().replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+    const a = t.indexOf("{"), b = t.lastIndexOf("}");
+    if (a < 0 || b <= a) throw new Error("Не нашли JSON. Вставьте ответ Claude целиком.");
+    return JSON.parse(t.slice(a, b + 1));
+  }
+
+  function renderAi() {
+    const r = state.review, m = MODES[r.mode], x = analyze(r);
+    const canRun = !!(cap.sample && cap.limits);
+    const canImages = !!(cap.limits && cap.limits.images);
+    const status = x.aiDone
+      ? `<div class="ai-status">${pill("ok", "Проведена")}<span class="muted">${esc(fmtDate(r.ai.at))}, ${esc(fmtTime(r.ai.at))} · ${esc(r.ai.source || "")} · находок ИИ: ${x.aiFindings.length} · расхождений: ${x.conflicts.length}</span></div>${r.ai.summary ? `<p>${esc(r.ai.summary)}</p>` : ""}`
+      : `<div class="ai-status">${pill("neutral", "Не проведена")}<span class="muted">${m.ai ? "Для этой проверки обязательна." : "Для быстрой проверки — по желанию."}</span></div>`;
+    const thumbs = ai.files.length ? `<div class="thumbs">${ai.urls.map((u, k) => `<div class="thumb"><img src="${u}" alt="Экран ${k + 1}"><button type="button" data-act="ai-remove" data-k="${k}" aria-label="Убрать экран ${k + 1}">×</button></div>`).join("")}</div>` : "";
+    const runBlock = canRun ? `
+      <section class="card panel" aria-labelledby="ai-run-h">
+        <h2 id="ai-run-h">Запустить здесь</h2>
+        <p class="muted">Claude получит экраны, описание и все ${x.items.length} ${plural(x.items.length, "пункт", "пункта", "пунктов")} с критериями — те же, что у вас. Запуск тратит лимит вашего аккаунта Claude; при первом запуске страница спросит разрешение. Изображения никуда не сохраняются, в историю попадает только результат.</p>
+        <div class="drop" id="ai-drop">
+          <label for="ai-files" style="font-weight:600">Экраны ${m.ctx === "design" ? "макета: все состояния ключевого сценария" : "сборки"}</label>
+          ${canImages ? `<input type="file" id="ai-files" multiple accept="${esc(cap.limits.images.mediaTypes.join(","))}">
+          <span class="hint muted" style="font-size:14px">Можно перетащить файлы сюда. До ${cap.limits.images.maxCount} изображений.</span>` : '<span class="muted">Отправка изображений здесь недоступна — опишите экраны текстом или используйте способ ниже.</span>'}
+          ${thumbs}
+        </div>
+        <div class="field">
+          <label for="ai-context">Описание и аннотации</label>
+          <textarea id="ai-context" data-act="ai-context" aria-describedby="ai-context-hint">${esc(r.aiContext || "")}</textarea>
+          <span class="hint" id="ai-context-hint">Что на экранах, в каком порядке они идут, тексты аннотаций: стадии сохранения, фокус, анимации. Чем полнее описание, тем меньше пунктов ИИ отметит как непроверяемые.</span>
+        </div>
+        ${ai.running
+          ? `<div class="row"><p class="progress-text" id="ai-progress" aria-live="polite">Claude проверяет… Готово частей: ${ai.done} из ${ai.total}. Обычно это занимает несколько минут.</p><button class="btn" type="button" data-act="ai-stop">Остановить</button></div>`
+          : `<div class="row"><button class="btn primary" type="button" data-act="ai-run">${x.aiDone ? "Провести заново" : "Запустить ИИ-проверку"}</button>${!ai.files.length && canImages ? '<span class="muted">Без экранов ИИ сможет оценить только описание.</span>' : ""}</div>`}
+        ${ai.error ? `<p class="error-text" role="alert">${esc(ai.error)}</p>` : ""}
+      </section>` : `
+      <section class="card panel"><h2>Запустить здесь</h2><p class="muted">Запуск прямо со страницы работает в опубликованной версии чек-листа на claude.ai. Здесь используйте способ ниже.</p></section>`;
+    return `
+    <div class="check">
+      ${sideHtml()}
+      <div class="ai-view">
+        <div class="group-head" style="margin:0">
+          <span class="eyebrow">Вторая проверка</span>
+          <h2 id="ai-h" tabindex="-1">ИИ-проверка</h2>
+          <p>Claude проходит те же пункты по тем же критериям. Его ответ по пункту появляется только после вашего. Каждую находку ИИ, с которой вы не согласны, нужно отклонить с причиной — иначе вердикт не выносится.</p>
+        </div>
+        <section class="card panel" aria-label="Состояние">${status}</section>
+        ${runBlock}
+        <section class="card panel" aria-labelledby="ai-ext-h">
+          <h2 id="ai-ext-h">Другой способ: Claude Code или чат</h2>
+          <ol class="list-plain">
+            <li>Скопируйте задание. В нём контекст этой проверки и все критерии.</li>
+            <li>Вставьте его в Claude вместе со скриншотами. В Claude Code в репозитории стандарта можно вызвать <code>/design-check</code>.</li>
+            <li>Скопируйте ответ Claude целиком и вставьте ниже.</li>
+          </ol>
+          <div class="row"><button class="btn" type="button" data-act="ai-copy">Скопировать задание для ИИ</button></div>
+          <label for="ai-paste" style="font-weight:600">Ответ Claude</label>
+          <textarea id="ai-paste" class="paste" placeholder='{"summary": "…", "items": [{"id": "R2.1", "criteria": [true, true, false], …}]}'></textarea>
+          <div class="row"><button class="btn primary" type="button" data-act="ai-import">Загрузить результат</button></div>
+          ${ai.pasteError ? `<p class="error-text" role="alert">${esc(ai.pasteError)}</p>` : ""}
+        </section>
+        <div class="row">
+          <button class="btn" type="button" data-act="group" data-idx="0">← К пунктам</button>
+          <button class="btn primary" type="button" data-act="open-summary">К итогу</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ------------------------------------------------------------------ Итог
   function renderSummary() {
     const r = state.review, x = analyze(r), v = verdict(r), m = MODES[r.mode];
-    const sevOrder = { P0: 0, P1: 1, P2: 2, P3: 3 };
-    const finds = x.findings.slice().sort((a, b) => (sevOrder[ans(a.id).sev] ?? 4) - (sevOrder[ans(b.id).sev] ?? 4));
+    const finds = x.findings.slice().sort((a, b) => (SEV_ORDER[ans(a.id).sev] ?? 4) - (SEV_ORDER[ans(b.id).sev] ?? 4));
     const findHtml = finds.length ? finds.map((i) => {
-      const a = ans(i.id);
+      const a = ans(i.id), st = statusOf(i.id), rec = reconcile(i.id);
       return `<div class="card finding ${a.sev || ""}">
         <div class="f-top">
           <span class="f-sev">${a.sev ? a.sev + " · " + SEV.find((s) => s.k === a.sev).label : "Серьёзность не указана"}</span>
           <span class="plate">${i.id}</span>
-          <span class="tag">${a.s === "partial" ? "Частично" : "Нет"}</span>
+          <span class="tag">${STATUS_LABEL[st]}</span>
+          ${rec === "agree" ? '<span class="tag">ИИ тоже нашёл</span>' : rec === "human-only" ? '<span class="tag">ИИ не увидел</span>' : ""}
           ${a.exc ? '<span class="tag">Оформлено исключение</span>' : ""}
         </div>
         <p class="f-q">${esc(q(i, r.mode))}</p>
-        ${a.note ? `<p class="f-note">${esc(a.note)}</p>` : '<p class="f-note empty-note">Нет описания. Добавьте, что именно не так, — иначе задачу не воспроизвести.</p>'}
+        <ul class="list-plain" style="font-size:14px">${crit(i, r.mode).map((c, n) => (a.c && a.c[n] === false ? `<li>Не выполнено: ${esc(c)}</li>` : "")).join("")}</ul>
+        ${a.note ? `<p class="f-note">${esc(a.note)}</p>` : '<p class="f-note empty-note">Нет описания. Добавьте, где именно и как воспроизвести, — иначе задачу не взять в работу.</p>'}
         <div class="row">
           <button class="btn small" type="button" data-act="goto" data-id="${i.id}">Открыть пункт</button>
           <button class="btn small" type="button" data-act="copy-issue" data-id="${i.id}">Скопировать как задачу</button>
         </div>
       </div>`;
     }).join("") : '<p class="empty">Находок нет.</p>';
-    const listBlock = (title, list) => list.length ? `
+    const listBlock = (title, list, extra) => list.length ? `
       <details class="card more" ${list.length <= 5 ? "open" : ""}>
         <summary><span>${title}</span><span class="g-count">${list.length}</span></summary>
-        <ul class="list-plain">${list.map((i) => `<li><button class="linkbtn" type="button" data-act="goto" data-id="${i.id}">${i.id}</button> — ${esc(q(i, r.mode))}</li>`).join("")}</ul>
+        <ul class="list-plain">${list.map((i) => `<li><button class="linkbtn" type="button" data-act="goto" data-id="${i.id}">${i.id}</button> — ${esc(q(i, r.mode))}${extra ? extra(i) : ""}</li>`).join("")}</ul>
       </details>` : "";
-    const pendingList = listBlock("Без ответа", x.unanswered);
-    const unknownList = listBlock("Не удалось проверить", x.unknown);
-    const people = r.mode === "audit" ? `
-      <label class="toggle" style="color:var(--ink)"><input type="checkbox" id="people-checked" ${r.peopleChecked ? "checked" : ""}> Результат подтверждён наблюдением за 3–5 людьми, выполнявшими задачи без подсказок</label>` : "";
-    const teamBtn = cap.db
-      ? `<button class="btn primary" type="button" data-act="team-save">${r.savedToTeam ? "Сохранить сейчас" : "Сохранить в историю команды"}</button>` : "";
+    const twoChecks = `
+      <section class="stack" style="gap:12px" aria-labelledby="two-h">
+        <h2 id="two-h" style="font-size:22px">Две проверки</h2>
+        ${x.aiDone ? `
+        <div class="two">
+          <div class="card stat"><b>${x.agree.length}</b><span>совпали</span></div>
+          <div class="card stat"><b style="color:var(--warn)">${x.conflicts.length}</b><span>расхождений без решения</span></div>
+          <div class="card stat"><b>${x.rejected.length}</b><span>находок ИИ отклонено</span></div>
+          <div class="card stat"><b>${x.humanOnly.length}</b><span>нашёл только человек</span></div>
+          <div class="card stat"><b>${x.aiUnknown.length}</b><span>ИИ не смог проверить</span></div>
+        </div>
+        ${r.ai.summary ? `<p class="muted">ИИ: ${esc(r.ai.summary)}</p>` : ""}
+        ${listBlock("Расхождения без решения", x.conflicts)}
+        ${listBlock("Отклонённые находки ИИ", x.rejected, (i) => ` <span class="muted">— ${esc(ans(i.id).aiReject)}</span>`)}`
+        : `<p class="empty">${m.ai ? "ИИ-проверка ещё не проведена — без неё вердикт не выносится." : "Для быстрой проверки ИИ-проверка по желанию."} <button class="linkbtn" type="button" data-act="open-ai">Перейти к ИИ-проверке</button></p>`}
+      </section>`;
+    const people = r.mode === "audit" ? `<label class="toggle" style="color:var(--ink)"><input type="checkbox" id="people-checked" ${r.peopleChecked ? "checked" : ""}> Результат подтверждён наблюдением за 3–5 людьми, выполнявшими задачи без подсказок</label>` : "";
+    const teamBtn = cap.db ? `<button class="btn primary" type="button" data-act="team-save">${r.savedToTeam ? "Сохранить сейчас" : "Сохранить в историю команды"}</button>` : "";
     const dlBtn = cap.downloads ? '<button class="btn" type="button" data-act="download">Скачать .md</button>' : "";
     const del = r.savedToTeam && cap.db ? (state.confirmDelete
       ? `<div class="confirm" role="alert"><span>Удалить проверку из истории команды без возможности восстановить?</span><button class="btn small danger" type="button" data-act="delete-yes">Удалить</button><button class="btn small" type="button" data-act="delete-no">Отмена</button></div>`
@@ -878,15 +1183,16 @@ button, input, textarea { font: inherit; color: inherit; }
           <div class="card stat"><b>${x.answered}/${x.items.length}</b><span>отвечено</span></div>
           ${SEV.map((s) => `<div class="card stat ${s.k}"><b>${x.sevCount[s.k]}</b><span>${s.k} · ${s.label.toLowerCase()}</span></div>`).join("")}
         </div>
+        ${twoChecks}
         <section class="stack" style="gap:12px" aria-labelledby="finds-h">
           <h2 id="finds-h" style="font-size:22px">Находки</h2>
           <div class="findings">${findHtml}</div>
         </section>
-        ${pendingList}
-        ${unknownList}
+        ${listBlock("Без ответа", x.unanswered)}
+        ${listBlock("Человек не смог проверить", x.unknown)}
         <section class="card export" aria-labelledby="export-h">
           <h2 id="export-h" style="font-size:20px">Отчёт</h2>
-          <p class="muted">Отчёт в Markdown по шаблону отчёта аудита: вставьте в задачу, в документ или отдайте Claude, чтобы он завёл задачи по находкам.</p>
+          <p class="muted">Отчёт в Markdown: вердикт, сверка двух проверок, находки и все пункты. Вставьте в задачу или документ либо отдайте Claude, чтобы он завёл задачи по находкам.</p>
           <div class="row">
             ${teamBtn}
             <button class="btn" type="button" data-act="copy-report">Скопировать отчёт</button>
@@ -906,22 +1212,22 @@ button, input, textarea { font: inherit; color: inherit; }
     </div>`;
   }
 
+  // ------------------------------------------------------------------ Справочник
   function renderGuide() {
     const f = state.guideStage;
     const chips = [["all", "Все"], ["М", "Макет"], ["М+Р", "Макет и сборка"], ["Р", "Сборка"]]
       .map(([k, l]) => `<button type="button" class="choice" data-act="guide-filter" data-v="${k}" aria-pressed="${f === k}">${l}</button>`).join("");
+    const critList = (title, list) => `<div class="r-q"><b>${title}</b><ul class="list-plain">${list.map((c) => `<li>${esc(c)}</li>`).join("")}</ul></div>`;
     const body = DATA.principles.map((p) => {
-      const reqs = ITEMS.filter((i) => i.principle === p.n && (f === "all" || i.stage === f))
-        .sort((a, b) => Number(a.id.split(".")[1]) - Number(b.id.split(".")[1]));
+      const reqs = ITEMS.filter((i) => i.principle === p.n && (f === "all" || i.stage === f)).sort((a, b) => Number(a.id.split(".")[1]) - Number(b.id.split(".")[1]));
       if (!reqs.length) return "";
       return `<section class="principle" aria-labelledby="p-${p.n}">
         <div class="principle-head"><span class="num" aria-hidden="true">${p.n}</span><h2 id="p-${p.n}">${esc(p.title)}</h2></div>
         ${reqs.map((i) => `<article class="card req">
-          <div class="item-top"><span class="plate">${i.id}</span><span class="tag">${LEVEL[i.level]}</span><span class="tag">${STAGE[i.stage]}</span>${i.quick ? '<span class="tag">В быстрой проверке</span>' : ""}</div>
+          <div class="item-top"><span class="plate">${i.id}</span><span class="tag">${LEVEL[i.level]}</span><span class="tag">${STAGE[i.stage]}</span>${i.quick ? '<span class="tag">⚡ быстрая проверка</span>' : ""}</div>
           <p class="r-text">${esc(i.text)}</p>
-          ${i.stage === "Р" ? `<div class="r-q"><b>Вопрос</b>${esc(i.q)}</div>`
-            : i.stage === "М" ? `<div class="r-q"><b>Вопрос</b>${esc(i.q)}</div><div class="r-q"><b>Как проверить</b>${esc(i.how)}</div>`
-            : `<div class="r-q"><b>В макете</b>${esc(i.qDesign)}</div><div class="r-q"><b>В продукте</b>${esc(i.q)}</div>`}
+          ${sourcesHtml(i)}
+          ${i.stage === "М+Р" ? critList("Критерии в макете", i.criteriaDesign) + critList("Критерии в продукте", i.criteria) : critList("Критерии", i.criteria)}
           <p class="r-red">Тревожный признак: ${esc(i.red)}</p>
         </article>`).join("")}
       </section>`;
@@ -931,7 +1237,7 @@ button, input, textarea { font: inherit; color: inherit; }
       <div class="guide-intro">
         <span class="eyebrow">Стандарт · версия ${esc(DATA.version)}</span>
         <h1>Справочник требований</h1>
-        <p>Все ${ITEMS.length} ${plural(ITEMS.length, "требование", "требования", "требований")} по десяти принципам Дитера Рамса — с вопросом, по которому их проверяют, и признаком нарушения. Принципы принадлежат Рамсу, требования и вопросы — наша интерпретация для цифровых продуктов.</p>
+        <p>Все ${ITEMS.length} ${plural(ITEMS.length, "требование", "требования", "требований")}, сгруппированные по десяти принципам Дитера Рамса, с основаниями из подхода Джони Айва и Apple HIG и с критериями, по которым их проверяют человек и ИИ. Принципы и рекомендации принадлежат авторам, требования и критерии — наша интерпретация.</p>
       </div>
       <div class="filters" role="group" aria-label="Этап проверки">${chips}</div>
       ${body}
@@ -940,6 +1246,7 @@ button, input, textarea { font: inherit; color: inherit; }
 
   // ------------------------------------------------------------------ Отчёты
   const cell = (s) => String(s || "").replace(/\|/g, "\\|").replace(/\s*\n\s*/g, " ");
+  const REC_MD = { agree: "совпало", conflict: "расхождение", rejected: "ИИ отклонён", "human-only": "ИИ не увидел", "ai-unknown": "ИИ не проверил", pending: "—", noai: "—" };
   function reportMd() {
     const r = state.review; if (!r) return "";
     const x = analyze(r), v = verdict(r), m = MODES[r.mode];
@@ -949,22 +1256,30 @@ button, input, textarea { font: inherit; color: inherit; }
     if (r.link) L.push("", `**Ссылка:** ${r.link}`);
     L.push("", "## Итог", "", `**${v.title}**`, "", ...v.detail.map((d) => "- " + d), "");
     L.push("| Серьёзность | Количество |", "| --- | --- |", ...SEV.map((s) => `| ${s.k} — ${s.label.toLowerCase()} | ${x.sevCount[s.k]} |`));
-    L.push("", `Отвечено ${x.answered} из ${x.items.length}.`, "", "## Находки", "");
-    const order = { P0: 0, P1: 1, P2: 2, P3: 3 };
-    const finds = x.findings.slice().sort((a, b) => (order[ans(a.id).sev] ?? 4) - (order[ans(b.id).sev] ?? 4));
+    L.push("", `Отвечено ${x.answered} из ${x.items.length}.`, "", "## Две проверки", "");
+    if (x.aiDone) {
+      L.push(`ИИ-проверка: ${fmtDate(r.ai.at)}, ${r.ai.source || ""}.`, "");
+      L.push(`Совпали: ${x.agree.length} · расхождений без решения: ${x.conflicts.length} · находок ИИ отклонено: ${x.rejected.length} · нашёл только человек: ${x.humanOnly.length} · ИИ не смог проверить: ${x.aiUnknown.length}.`);
+      if (r.ai.summary) L.push("", `Вывод ИИ: ${r.ai.summary}`);
+      if (x.rejected.length) { L.push("", "Отклонённые находки ИИ:", ""); x.rejected.forEach((i) => L.push(`- **${i.id}** — ${ans(i.id).aiReject}`)); }
+      if (x.conflicts.length) { L.push("", "Расхождения без решения:", ""); x.conflicts.forEach((i) => L.push(`- **${i.id}** — ИИ: ${aiOf(i.id).ev || STATUS_LABEL[aiStatus(i.id)]}`)); }
+    } else L.push(m.ai ? "ИИ-проверка не проведена." : "ИИ-проверка не проводилась (по желанию).");
+    L.push("", "## Находки", "");
+    const finds = x.findings.slice().sort((a, b) => (SEV_ORDER[ans(a.id).sev] ?? 4) - (SEV_ORDER[ans(b.id).sev] ?? 4));
     if (finds.length) {
-      L.push("| # | Требование | Серьёзность | Статус | Что проверяли | Что не так |", "| --- | --- | --- | --- | --- | --- |");
+      L.push("| # | Требование | Серьёзность | Итог | ИИ | Что не выполнено | Заметка |", "| --- | --- | --- | --- | --- | --- | --- |");
       finds.forEach((i, n) => {
         const a = ans(i.id);
-        L.push(`| ${n + 1} | ${i.id} | ${a.sev || "не указана"} | ${STATUS_MD[a.s]}${a.exc ? ", исключение" : ""} | ${cell(q(i, r.mode))} | ${cell(a.note) || "—"} |`);
+        const failed = crit(i, r.mode).filter((c, k) => a.c && a.c[k] === false).join("; ");
+        L.push(`| ${n + 1} | ${i.id} | ${a.sev || "не указана"} | ${STATUS_MD[statusOf(i.id)]}${a.exc ? ", исключение" : ""} | ${REC_MD[reconcile(i.id)]} | ${cell(failed) || "—"} | ${cell(a.note) || "—"} |`);
       });
     } else L.push("Находок нет.");
     L.push("", "## Все пункты", "");
     modeGroups(r.mode).forEach((g) => {
       L.push(`### ${g.title}`, "");
       g.items.forEach((i) => {
-        const a = ans(i.id);
-        L.push(`- ${a.s ? STATUS_MD[a.s] : "без ответа"}${a.sev ? " " + a.sev : ""} **${i.id}** — ${q(i, r.mode)}${a.note ? `\n  ${a.note.replace(/\n/g, "\n  ")}` : ""}`);
+        const a = ans(i.id), st = statusOf(i.id), as = aiStatus(i.id);
+        L.push(`- ${st ? STATUS_MD[st] : "без ответа"}${a.sev ? " " + a.sev : ""} **${i.id}** — ${q(i, r.mode)}${as ? ` · ИИ: ${STATUS_MD[as]}` : ""}${a.note ? `\n  ${a.note.replace(/\n/g, "\n  ")}` : ""}`);
       });
       L.push("");
     });
@@ -972,26 +1287,22 @@ button, input, textarea { font: inherit; color: inherit; }
   }
   function issueMd(id) {
     const r = state.review, i = BY_ID[id], a = ans(id), sev = SEV.find((s) => s.k === a.sev);
-    const title = `[${id}] ${q(i, r.mode)}`;
+    const failed = crit(i, r.mode).filter((c, k) => a.c && a.c[k] === false);
     return [
-      `**${title}**`, "",
+      `**[${id}] ${q(i, r.mode)}**`, "",
       `**Требование:** ${id} — ${i.text}`, "",
       `**Серьёзность:** ${sev ? sev.k + " " + sev.label.toLowerCase() : "не указана"}`, "",
       `**Сценарий:** ${r.scenario || r.product}`, "",
       "## Что происходит", "", a.note || "<опишите шаги и наблюдаемое поведение>", "",
-      "## Что ожидается по стандарту", "", q(i, r.mode), "",
+      "## Что ожидается по стандарту", "", ...(failed.length ? failed.map((c) => "- " + c) : [q(i, r.mode)]), "",
       "## Доказательство", "", r.link ? r.link : "<скриншот, запись экрана, вывод автопроверки>", "",
     ].join("\n");
   }
-  async function copyText(text, okMsg) {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast(okMsg);
-    } catch (e) {
-      state.exportOpen = true;
-      render();
-      const ta = $("#export-text");
-      if (ta) { ta.value = text; ta.focus(); ta.select(); }
+  async function copyText(text, okMsg, fallbackId) {
+    try { await navigator.clipboard.writeText(text); toast(okMsg); }
+    catch (e) {
+      if (fallbackId === "ai-paste") { const ta = $("#ai-paste"); if (ta) { ta.value = text; ta.focus(); ta.select(); } }
+      else { state.exportOpen = true; render(); const ta = $("#export-text"); if (ta) { ta.value = text; ta.focus(); ta.select(); } }
       toast("Не получилось скопировать автоматически — текст выделен, скопируйте его вручную.");
     }
   }
@@ -1002,19 +1313,21 @@ button, input, textarea { font: inherit; color: inherit; }
     if (!product) { $("#f-product-err").hidden = false; form.product.focus(); return; }
     state.review = {
       id: null, mode: state.setupMode, product, scenario: form.scenario.value.trim(), link: form.link.value.trim(), people: form.people.value.trim(),
-      answers: {}, peopleChecked: false, createdAt: Date.now(), authorId: cap.myId || "", savedToTeam: false,
+      aiContext: "", answers: {}, ai: null, peopleChecked: false, createdAt: Date.now(), authorId: cap.myId || "", savedToTeam: false,
     };
+    ai.files.forEach((f, k) => { try { URL.revokeObjectURL(ai.urls[k]); } catch (e) { /* нечего освобождать */ } });
+    ai.files = []; ai.urls = []; ai.error = ""; ai.pasteError = "";
     saveStatus = "";
     state.view = "check"; state.groupIdx = 0; state.confirmDelete = false; state.exportOpen = false;
-    persistDraft();
-    render("#group-h");
-    window.scrollTo(0, 0);
+    persistDraft(); render("#group-h"); window.scrollTo(0, 0);
   }
 
-  function setAnswer(id, patch) {
+  function patchAnswer(id, fn) {
     const r = state.review;
-    const a = Object.assign({}, r.answers[id] || {}, patch);
-    if (!FINDING(a.s)) { delete a.sev; delete a.exc; }
+    const a = Object.assign({}, r.answers[id] || {});
+    fn(a);
+    delete a.s; // старый формат без критериев больше не используется после правки
+    if (!FINDING(statusFrom(a.c, crit(BY_ID[id], r.mode).length)) || a.x) { delete a.sev; delete a.exc; }
     r.answers[id] = a;
     changed();
   }
@@ -1022,8 +1335,7 @@ button, input, textarea { font: inherit; color: inherit; }
   function rerenderItem(id, focusSel) {
     const el = $("#item-" + CSS.escape(id));
     if (el) el.outerHTML = itemHtml(BY_ID[id]);
-    const side = $(".side");
-    if (side) side.outerHTML = sideHtml();
+    const side = $(".side"); if (side) side.outerHTML = sideHtml();
     updateSaveUi();
     if (focusSel) { const f = $(focusSel); if (f) f.focus({ preventScroll: true }); }
   }
@@ -1032,22 +1344,19 @@ button, input, textarea { font: inherit; color: inherit; }
     const groups = modeGroups(state.review.mode);
     const idx = groups.findIndex((g) => g.items.some((i) => i.id === id));
     if (idx < 0) return;
-    state.view = "check"; state.groupIdx = idx; persistDraft();
-    render();
+    state.view = "check"; state.groupIdx = idx; persistDraft(); render();
     const el = $("#item-" + CSS.escape(id));
-    if (el) { el.scrollIntoView({ block: "start" }); const b = el.querySelector(".choice"); if (b) b.focus({ preventScroll: true }); }
+    if (el) { el.scrollIntoView({ block: "start" }); const b = el.querySelector(".yn"); if (b) b.focus({ preventScroll: true }); }
   }
 
   async function openHistory(id) {
     const h = cap.history.find((x) => x.id === id);
     if (!h) return;
     let data = h;
-    try { const snap = await cap.db.collection("reviews").doc(id).get(); if (snap.exists) data = snap.data(); } catch (e) { /* берём то, что уже пришло в подписке */ }
+    try { const snap = await cap.db.collection("reviews").doc(id).get(); if (snap.exists) data = snap.data(); } catch (e) { /* берём то, что пришло в подписке */ }
     state.review = deserialize(id, data);
     saveStatus = ""; state.view = "summary"; state.groupIdx = 0; state.confirmDelete = false; state.exportOpen = false;
-    persistDraft();
-    render("#verdict-h");
-    window.scrollTo(0, 0);
+    persistDraft(); render("#verdict-h"); window.scrollTo(0, 0);
   }
 
   async function deleteReview() {
@@ -1067,38 +1376,44 @@ button, input, textarea { font: inherit; color: inherit; }
   async function download() {
     const r = state.review;
     const name = `${MODES[r.mode].title} — ${r.product}`.replace(/[\\/:*?"<>|]+/g, " ").slice(0, 120) + ".md";
-    try {
-      await cap.downloads.save({ filename: name, data: reportMd() });
-    } catch (e) {
+    try { await cap.downloads.save({ filename: name, data: reportMd() }); }
+    catch (e) {
       if (e && e.code === "declined") return;
       toast(e && e.code === "rate_limited" ? "Окно сохранения уже открыто." : "Скачать не получилось. Скопируйте отчёт.");
     }
   }
 
+  function go(view, focusSel) { state.view = view; state.confirmDelete = false; persistDraft(); render(focusSel); window.scrollTo(0, 0); }
+
   document.addEventListener("click", (e) => {
-    const go = e.target.closest("[data-go]");
-    if (go) {
-      state.view = go.dataset.go; state.confirmDelete = false;
-      if (state.view === "guide") { try { history.replaceState(null, "", "#guide"); } catch (err) { /* без истории */ } }
-      else { try { history.replaceState(null, "", location.pathname + location.search); } catch (err) { /* без истории */ } }
-      persistDraft(); render(); window.scrollTo(0, 0);
+    const g = e.target.closest("[data-go]");
+    if (g) {
+      try { history.replaceState(null, "", g.dataset.go === "guide" ? "#guide" : location.pathname + location.search); } catch (err) { /* без истории */ }
+      go(g.dataset.go);
       return;
     }
     const t = e.target.closest("[data-act]");
-    if (!t || t.tagName === "TEXTAREA") return;
+    if (!t || t.tagName === "TEXTAREA" || t.tagName === "INPUT") return;
     const act = t.dataset.act, id = t.dataset.id;
     switch (act) {
-      case "new": state.setupMode = t.dataset.mode; state.view = "setup"; render("#f-product"); window.scrollTo(0, 0); break;
-      case "resume": state.view = "check"; persistDraft(); render("#group-h"); window.scrollTo(0, 0); break;
-      case "open-summary": state.view = "summary"; state.confirmDelete = false; persistDraft(); render("#verdict-h"); window.scrollTo(0, 0); break;
-      case "group": state.view = "check"; state.groupIdx = Number(t.dataset.idx); persistDraft(); render("#group-h"); window.scrollTo(0, 0); break;
-      case "status": {
-        const cur = ans(id).s;
-        setAnswer(id, { s: cur === t.dataset.v ? undefined : t.dataset.v });
-        rerenderItem(id, `#item-${CSS.escape(id)} .choice[data-act="status"][data-v="${t.dataset.v}"]`);
+      case "new": state.setupMode = t.dataset.mode; go("setup", "#f-product"); break;
+      case "resume": go("check", "#group-h"); break;
+      case "open-summary": go("summary", "#verdict-h"); break;
+      case "open-ai": go("ai", "#ai-h"); break;
+      case "group": state.groupIdx = Number(t.dataset.idx); go("check", "#group-h"); break;
+      case "crit": {
+        const n = Number(t.dataset.n), val = t.dataset.v === "1";
+        patchAnswer(id, (a) => {
+          const len = crit(BY_ID[id], state.review.mode).length;
+          const c = Array.from({ length: len }, (_, k) => (Array.isArray(a.c) ? a.c[k] : undefined));
+          c[n] = c[n] === val ? undefined : val;
+          a.c = c;
+        });
+        rerenderItem(id, `#item-${CSS.escape(id)} .yn[data-n="${n}"][data-v="${t.dataset.v}"]`);
         break;
       }
-      case "sev": setAnswer(id, { sev: t.dataset.v }); rerenderItem(id, `#item-${CSS.escape(id)} .sev[data-v="${t.dataset.v}"]`); break;
+      case "x": patchAnswer(id, (a) => { a.x = a.x === t.dataset.v ? undefined : t.dataset.v; }); rerenderItem(id, `#item-${CSS.escape(id)} [data-act="x"][data-v="${t.dataset.v}"]`); break;
+      case "sev": patchAnswer(id, (a) => { a.sev = t.dataset.v; }); rerenderItem(id, `#item-${CSS.escape(id)} .sev[data-v="${t.dataset.v}"]`); break;
       case "goto": gotoItem(id); break;
       case "copy-issue": copyText(issueMd(id), "Задача скопирована."); break;
       case "copy-report": copyText(reportMd(), "Отчёт скопирован."); break;
@@ -1110,6 +1425,18 @@ button, input, textarea { font: inherit; color: inherit; }
       case "delete-yes": deleteReview(); break;
       case "open-history": openHistory(id); break;
       case "guide-filter": state.guideStage = t.dataset.v; render(); break;
+      case "ai-run": runAi(); break;
+      case "ai-stop": if (ai.ctl) ai.ctl.abort(); break;
+      case "ai-remove": removeFile(Number(t.dataset.k)); break;
+      case "ai-copy": copyText(aiPrompt(state.review.mode, modeItems(state.review.mode), aiContextText(state.review)), "Задание скопировано. Вставьте его в Claude вместе со скриншотами.", "ai-paste"); break;
+      case "ai-import": {
+        const text = ($("#ai-paste") || {}).value;
+        try {
+          applyAi(normalizeAi(parsePasted(text), modeItems(state.review.mode)), "Загружена из ответа Claude");
+          ai.pasteError = ""; render("#ai-h"); toast("Результат ИИ загружен. Ответы ИИ открываются в пунктах после ваших.");
+        } catch (err) { ai.pasteError = (err && err.message) || "Не удалось прочитать ответ."; render(); const ta = $("#ai-paste"); if (ta) ta.value = text; }
+        break;
+      }
     }
   });
 
@@ -1117,22 +1444,34 @@ button, input, textarea { font: inherit; color: inherit; }
     const t = e.target;
     if (t.id === "hints-toggle") { prefs.hints = t.checked; store.set(PREF_KEY, prefs); render("#hints-toggle"); return; }
     if (t.id === "people-checked") { state.review.peopleChecked = t.checked; changed(); render("#people-checked"); return; }
-    if (t.dataset && t.dataset.act === "exc") { setAnswer(t.dataset.id, { exc: t.checked }); rerenderItem(t.dataset.id, `#item-${CSS.escape(t.dataset.id)} input[data-act="exc"]`); }
+    if (t.id === "ai-files") { addFiles(t.files); return; }
+    if (t.dataset && t.dataset.act === "exc") { patchAnswer(t.dataset.id, (a) => { a.exc = t.checked; }); rerenderItem(t.dataset.id, `#item-${CSS.escape(t.dataset.id)} input[data-act="exc"]`); }
   });
 
   document.addEventListener("input", (e) => {
-    const t = e.target;
-    if (t.dataset && t.dataset.act === "note") {
-      const r = state.review, id = t.dataset.id;
-      r.answers[id] = Object.assign({}, r.answers[id] || {}, { note: t.value });
+    const t = e.target, r = state.review;
+    if (!t.dataset) return;
+    if (t.dataset.act === "note") { r.answers[t.dataset.id] = Object.assign({}, r.answers[t.dataset.id] || {}, { note: t.value }); changed(); }
+    if (t.dataset.act === "ai-reject") {
+      const id = t.dataset.id, before = reconcile(id);
+      r.answers[id] = Object.assign({}, r.answers[id] || {}, { aiReject: t.value });
       changed();
+      if (before !== reconcile(id)) { const side = $(".side"); if (side) side.outerHTML = sideHtml(); }
     }
+    if (t.dataset.act === "ai-context") { r.aiContext = t.value; changed(); }
     if (t.id === "f-product" && t.value.trim()) { const err = $("#f-product-err"); if (err) err.hidden = true; }
   });
 
-  document.addEventListener("submit", (e) => {
-    if (e.target.id === "setup-form") { e.preventDefault(); startReview(e.target); }
+  document.addEventListener("dragover", (e) => { const d = e.target.closest && e.target.closest("#ai-drop"); if (d) { e.preventDefault(); d.classList.add("over"); } });
+  document.addEventListener("dragleave", (e) => { const d = e.target.closest && e.target.closest("#ai-drop"); if (d) d.classList.remove("over"); });
+  document.addEventListener("drop", (e) => {
+    const d = e.target.closest && e.target.closest("#ai-drop");
+    if (!d) return;
+    e.preventDefault(); d.classList.remove("over");
+    if (e.dataTransfer && e.dataTransfer.files.length && cap.limits && cap.limits.images) addFiles(e.dataTransfer.files);
   });
+
+  document.addEventListener("submit", (e) => { if (e.target.id === "setup-form") { e.preventDefault(); startReview(e.target); } });
 
   render();
   initCapabilities();
